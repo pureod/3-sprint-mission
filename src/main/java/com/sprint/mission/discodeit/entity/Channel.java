@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Channel extends BaseEntity {
 
@@ -92,13 +93,13 @@ public class Channel extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Channel{" +
-                "channelName='" + channelName + '\'' +
-                ", channelDescription='" + channelDescription + '\'' +
-                ", isPrivate=" + isPrivate +
-                ", creator=" + creator +
-                ", memberCount=" + memberCount +
-                ", memberList=" + memberList +
+        return "[Channel] {" +
+                 channelName + '\'' +
+                " " + channelDescription + '\'' +
+                " " + isPrivate +
+                " " + creator +
+                " " + memberCount +
+                " memberList: " + memberList.stream().map(u -> u.getUserName()).collect(Collectors.toList())+
                 '}';
     }
 }

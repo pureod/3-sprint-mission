@@ -35,7 +35,7 @@ public class Message extends BaseEntity {
 
     @Override
     public String toString() {
-        return "Message{" +
+        return "[Message] " +
                 " time: " + getUpdatedAt() +
                 ", userId: " + user.getUserName() +
                 ", channelId: " + channel.getChannelName() +

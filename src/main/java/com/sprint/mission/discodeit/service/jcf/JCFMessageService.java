@@ -30,11 +30,13 @@ public class JCFMessageService implements MessageService {
 
         User realUser = userService.readById(user.getId());
         if (realUser == null) {
+            System.out.println("User not found!!!");
             throw new IllegalArgumentException("User not found: " + user.getId());
         }
 
         Channel realChannel = channelService.readById(channel.getId());
         if (realChannel == null) {
+            System.out.println("Channel not found!!!");
             throw new IllegalArgumentException("Channel not found: " + channel.getId());
         }
 

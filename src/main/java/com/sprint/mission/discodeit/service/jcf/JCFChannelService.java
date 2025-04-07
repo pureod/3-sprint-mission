@@ -68,7 +68,7 @@ public class JCFChannelService implements ChannelService {
             return;
         }
         c.join(user);
-        System.out.println(user.getUserName() + "Joined channel " + channel.getChannelName());
+        System.out.println(user.getUserName() + " Joined channel !!! [" + channel.getChannelName()+"]");
         System.out.println();
     }
 
@@ -85,7 +85,7 @@ public class JCFChannelService implements ChannelService {
                 System.out.println(user.getUserName() + "님은 아직 " + channel.getChannelName() + "채널에 머물러있습니다");
             }
         } else {
-            System.out.println(user.getUserName() + "님이  " + channel.getChannelName() + "채널을 떠났습니다");
+            System.out.println(user.getUserName() + "님이 " + channel.getChannelName() + "채널을 떠났습니다");
             channel.leave(user);
         }
     }
