@@ -154,7 +154,7 @@ public class JavaApplication {
         Message message1 = messageService.create(p1, ch1, "위워크 금욜 ㄱㄱ");
         Message message2 = messageService.create(p2, ch1, "ㅇㅋㅇㅋ");
         Message message3 = messageService.create(p3, ch3, "미드");
-        Message message4 = messageService.create(p4, ch4, "예약 완료");
+        Message message4 = messageService.create(p2, ch1, "예약 완료");
         Message message5 = messageService.create(p5, ch1, "ㅇㅋ");
         Message message6 = messageService.create(p1, ch3, "정글");
 

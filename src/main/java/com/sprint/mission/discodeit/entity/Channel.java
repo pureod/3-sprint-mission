@@ -11,6 +11,7 @@ public class Channel extends BaseEntity {
     private String password;
     private int memberCount;
     private Set<User> memberList;
+    private Set<Message> messageList;
 
     public Channel(String channelName, String channelDescription,
                    boolean isPrivate, User creator) {

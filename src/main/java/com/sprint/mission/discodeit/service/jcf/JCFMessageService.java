@@ -26,7 +26,18 @@ public class JCFMessageService implements MessageService {
     }
 
     public Message create(User user, Channel channel, String content) {
-        Message message = new Message(user, channel, content);
+
+        User realUser = userService.readById(user.getId());
+        if (realUser == null) {
+            throw new IllegalArgumentException("User not found: " + user.getId());
+        }
+
+        Channel realChannel = channelService.readById(channel.getId());
+        if (realChannel == null) {
+            throw new IllegalArgumentException("Channel not found: " + channel.getId());
+        }
+
+        Message message = new Message(realUser, realChannel, content);
         messageList.put(message.getId(), message);
         return message;
     }
