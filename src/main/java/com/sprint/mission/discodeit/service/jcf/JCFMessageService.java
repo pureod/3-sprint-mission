@@ -25,6 +25,7 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
+    @Override
     public Message create(User user, Channel channel, String content) {
 
         User realUser = userService.readById(user.getId());
@@ -42,28 +43,32 @@ public class JCFMessageService implements MessageService {
         return message;
     }
 
-
+    @Override
     public Message readById(UUID id) {
         return messageList.get(id);
     }
 
+    @Override
     public List<Message> readByChannelId(UUID id) {
         return messageList.values()
                 .stream().filter(m -> m.getChannel().getId().equals(id))
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<Message> readAll() {
 
         return messageList.values().stream().collect(Collectors.toList());
     }
 
+    @Override
     public void update(UUID id, String content) {
 
         Message message = messageList.get(id);
         message.update(content);
     }
 
+    @Override
     public void deleteById(UUID id) {
         messageList.remove(id);
     }

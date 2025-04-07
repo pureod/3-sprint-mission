@@ -15,6 +15,7 @@ public class JCFChannelService implements ChannelService {
         channelList = new HashMap<>();
     }
 
+    @Override
     public Channel create(String channelName, String channelDescription,
                           boolean isPrivate, User creator, String password) {
         Channel channel = new Channel(channelName, channelDescription, isPrivate, creator, password);
@@ -22,14 +23,17 @@ public class JCFChannelService implements ChannelService {
         return channel;
     }
 
+    @Override
     public Channel readById(UUID channelId) {
         return channelList.get(channelId);
     }
 
+    @Override
     public List<Channel> readAll() {
         return channelList.values().stream().collect(Collectors.toList());
     }
 
+    @Override
     public void update(Channel channel, String ModifiedChannelName, String channelDescription,
                        boolean isPrivate) {
         Channel c = channelList.get(channel.getId());
@@ -37,6 +41,7 @@ public class JCFChannelService implements ChannelService {
     }
 
 
+    @Override
     public void deleteById(User user, Channel channel) {
         if (channel.getCreator().equals(user)) {
             channelList.remove(channel.getId());
@@ -47,6 +52,7 @@ public class JCFChannelService implements ChannelService {
 
     }
 
+    @Override
     public void joinChannel(User user, Channel channel, String password) {
         Channel c = channelList.get(channel.getId());
         if (c == null) {
@@ -66,6 +72,7 @@ public class JCFChannelService implements ChannelService {
         System.out.println();
     }
 
+    @Override
     public void leave(User user, Channel channel) {
         if (channel.getCreator().getId().equals(user.getId())) {
             System.out.println("You are creator of this channel.\n Are you sure you want to leave? \n Y/N");

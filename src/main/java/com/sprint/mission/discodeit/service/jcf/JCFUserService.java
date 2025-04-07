@@ -17,21 +17,25 @@ public class JCFUserService implements UserService {
         userList = new HashMap<>();
     }
 
+    @Override
     public User create(String userName, String userId, String userPassword, String userEmail) {
         User user = new User(userName, userId, userPassword, userEmail);
         userList.put(user.getId(), user);
         return user;
     }
 
+    @Override
     public User readById(UUID userId) {
         return userList.get(userId);
     }
 
+    @Override
     public List<User> readAll() {
         return userList.values().stream().collect(Collectors.toList());
     }
 
     //수정 필요성 (DTO로 수정할 파라미터를 받는게 제일 깔끔할 듯, 그러나 오버라이드도 가능)
+    @Override
     public void update(User user, String userName, String ModifiedUserId
             , String userPassword, String userEmail) {
         User u = userList.get(user.getId());
@@ -39,6 +43,7 @@ public class JCFUserService implements UserService {
 
     }
 
+    @Override
     public void deleteById(User user) {
         userList.remove(user.getId());
     }
