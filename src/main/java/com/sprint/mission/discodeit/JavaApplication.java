@@ -29,11 +29,11 @@ public class JavaApplication {
         User person4 = userService.create("조현아", "SB004", "B004", "sb004@gmail.com");
         User person5 = userService.create("정윤지", "SB005", "B005", "sb005@gmail.com");
 
-        System.out.println(person1.getUserName()+"님이 등록되었습니다");
-        System.out.println(person2.getUserName()+"님이 등록되었습니다");
-        System.out.println(person3.getUserName()+"님이 등록되었습니다");
-        System.out.println(person4.getUserName()+"님이 등록되었습니다");
-        System.out.println(person5.getUserName()+"님이 등록되었습니다");
+        System.out.println(person1.getUserName() + "님이 등록되었습니다");
+        System.out.println(person2.getUserName() + "님이 등록되었습니다");
+        System.out.println(person3.getUserName() + "님이 등록되었습니다");
+        System.out.println(person4.getUserName() + "님이 등록되었습니다");
+        System.out.println(person5.getUserName() + "님이 등록되었습니다");
         System.out.println();
 
         //2-1.전체 사용자 조회
@@ -82,14 +82,14 @@ public class JavaApplication {
         System.out.println("----------채널 등록----------");
         Channel ch1 = channelService.create("스프린트 스프링 3기", "스프링 백엔드", false, person1, "");
         Channel ch2 = channelService.create("스프린트 커뮤니티", "스프링 백엔드", false, person2, "");
-        Channel ch3 = channelService.create("롤 다인큐", "스프링 백엔드", true, person3,  "1234");
+        Channel ch3 = channelService.create("롤 다인큐", "스프링 백엔드", true, person3, "1234");
         Channel ch4 = channelService.create("야놀자", "스프링 백엔드", false, person4, "");
         Channel ch5 = channelService.create("점메추", "스프링 백엔드", false, person5, "");
-        System.out.println(ch1.getChannelName()+" 채널이 생성 되었습니다");
-        System.out.println(ch2.getChannelName()+" 채널이 생성 되었습니다");
-        System.out.println(ch3.getChannelName()+" 채널이 생성 되었습니다");
-        System.out.println(ch4.getChannelName()+" 채널이 생성 되었습니다");
-        System.out.println(ch5.getChannelName()+" 채널이 생성 되었습니다");
+        System.out.println(ch1.getChannelName() + " 채널이 생성 되었습니다");
+        System.out.println(ch2.getChannelName() + " 채널이 생성 되었습니다");
+        System.out.println(ch3.getChannelName() + " 채널이 생성 되었습니다");
+        System.out.println(ch4.getChannelName() + " 채널이 생성 되었습니다");
+        System.out.println(ch5.getChannelName() + " 채널이 생성 되었습니다");
         System.out.println();
 
         //2-1.전체 채널 조회
@@ -122,7 +122,7 @@ public class JavaApplication {
         System.out.print("삭제 할 채널 정보: ");
         targetChannel = ch4;
         System.out.println(channelService.readById(targetChannel.getId()));
-        channelService.deleteById(person4,targetChannel);
+        channelService.deleteById(person4, targetChannel);
         System.out.println();
 
         //6. 삭제 후 조회
@@ -132,15 +132,15 @@ public class JavaApplication {
 
         //7. 채널 멤버 추가
         System.out.println("----------채널 멤버 추가 ----------");
-        channelService.joinChannel(person2,ch3,"1234");
-        channelService.joinChannel(person1,ch3,"1234");
-        System.out.println("총 "+ch3.getMemberCount()+"명의 사용자가 채널에 있습니다.");
+        channelService.joinChannel(person2, ch3, "1234");
+        channelService.joinChannel(person1, ch3, "1234");
+        System.out.println("총 " + ch3.getMemberCount() + "명의 사용자가 채널에 있습니다.");
         System.out.println(ch3.getMemberList());
         System.out.println();
 
         //8. 채널 멤버 제거
         System.out.println("----------채널 멤버 제거 ----------");
-        channelService.leave(person2,ch3);
+        channelService.leave(person2, ch3);
         System.out.println();
 
         //----------------------Message----------------------
@@ -158,12 +158,12 @@ public class JavaApplication {
         Message message5 = messageService.create(person5, ch1, "ㅇㅋ");
         Message message6 = messageService.create(person1, ch3, "정글");
 
-        System.out.println(message1.getChannel().getChannelName()+" 채널에 "+message1.getUser().getUserName()+"님이 메세지를 보냈습니다.");
-        System.out.println(message2.getChannel().getChannelName()+" 채널에 "+message2.getUser().getUserName()+"님이 메세지를 보냈습니다.");
-        System.out.println(message3.getChannel().getChannelName()+" 채널에 "+message3.getUser().getUserName()+"님이 메세지를 보냈습니다.");
-        System.out.println(message4.getChannel().getChannelName()+" 채널에 "+message4.getUser().getUserName()+"님이 메세지를 보냈습니다.");
-        System.out.println(message5.getChannel().getChannelName()+" 채널에 "+message5.getUser().getUserName()+"님이 메세지를 보냈습니다.");
-        System.out.println(message6.getChannel().getChannelName()+" 채널에 "+message6.getUser().getUserName()+"님이 메세지를 보냈습니다.");
+        System.out.println(message1.getChannel().getChannelName() + " 채널에 " + message1.getUser().getUserName() + "님이 메세지를 보냈습니다.");
+        System.out.println(message2.getChannel().getChannelName() + " 채널에 " + message2.getUser().getUserName() + "님이 메세지를 보냈습니다.");
+        System.out.println(message3.getChannel().getChannelName() + " 채널에 " + message3.getUser().getUserName() + "님이 메세지를 보냈습니다.");
+        System.out.println(message4.getChannel().getChannelName() + " 채널에 " + message4.getUser().getUserName() + "님이 메세지를 보냈습니다.");
+        System.out.println(message5.getChannel().getChannelName() + " 채널에 " + message5.getUser().getUserName() + "님이 메세지를 보냈습니다.");
+        System.out.println(message6.getChannel().getChannelName() + " 채널에 " + message6.getUser().getUserName() + "님이 메세지를 보냈습니다.");
 
         System.out.println();
 
@@ -204,9 +204,10 @@ public class JavaApplication {
         messageService.readByChannelId(ch3.getId()).forEach(System.out::println);
         System.out.println();
 
-        //7. 유효성 검사 (현재 person4와 ch4 삭제 테스트로 인해 삭제된 상태)
+//        7. 유효성 검사 (현재 person4와 ch4 삭제 테스트로 인해 삭제된 상태)
 //        messageService.create(person4,ch1,"삭제된 유저");
 //        messageService.create(person1,ch4,"삭제된 채널");
+//        messageService.create(person1,ch3,"장실 점");
 
     }
 }
