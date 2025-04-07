@@ -47,6 +47,6 @@ public class User extends BaseEntity {
                 ", userId='" + userId + '\'' +
                 ", userPassword='" + userPassword + '\'' +
                 ", userEmail='" + userEmail + '\'' +
-                '}';
+                '}' + '\n';
     }
 }

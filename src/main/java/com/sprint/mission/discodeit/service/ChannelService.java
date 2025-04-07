@@ -1,21 +1,27 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
 
-    public void create(Channel channel);
+    public Channel create(String channelName, String channelDescription,
+                          boolean isPrivate, User creator, String password);
 
-    public List<Channel> readById(Channel channel);
+    public Channel readById(UUID channelId);
 
     public List<Channel> readAll();
 
-    public void update( Channel channel, String ModifiedChannelName, String channelDescription,
-                boolean isPrivate);
+    public void update(Channel channel, String ModifiedChannelName, String channelDescription,
+                       boolean isPrivate);
 
-    public void deleteById(Channel channel);
+    public void deleteById(User user, Channel channel);
+
+    public void joinChannel(User user, Channel channel, String password);
+
+    public void leave(User user, Channel channel);
 
 }

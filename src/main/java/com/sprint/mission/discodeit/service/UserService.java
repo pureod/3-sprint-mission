@@ -7,9 +7,9 @@ import java.util.UUID;
 
 public interface UserService {
 
-    public void create(User user);
+    public User create(String userName, String userId, String userPassword, String userEmail);
 
-    public List<User> readById(User user);
+    public User readById(UUID userId);
 
     public List<User> readAll();
 
