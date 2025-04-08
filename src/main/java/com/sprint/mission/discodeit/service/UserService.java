@@ -18,4 +18,6 @@ public interface UserService {
 
     public void deleteById(User user);
 
+    public boolean isValidPassword(String password);
+
 }

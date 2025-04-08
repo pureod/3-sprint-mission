@@ -63,7 +63,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("You are already member of this channel");
             return;
         }
-        if (!c.getPassword().equals(password) && c.getIsPrivate()) {
+        if (!c.getPassword().equals(password) && c.isPrivate()) {
             System.out.println("Password is incorrect!!!");
             return;
         }
