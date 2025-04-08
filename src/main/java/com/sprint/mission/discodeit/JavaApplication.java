@@ -144,7 +144,6 @@ public class JavaApplication {
         System.out.println();
 
         //----------------------Message----------------------
-
         List<Message> messageList = new ArrayList<>();
         MessageService messageService = new JCFMessageService(userService, channelService);
 
