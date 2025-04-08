@@ -10,7 +10,7 @@ public class Channel extends BaseEntity {
 
     private String channelName;
     private String channelDescription;
-    private boolean isPrivate; //false면 public, true면 private로 설정
+    private boolean isLock; //false면 public, true면 private로 설정
     private User creator;
     private String password;
     private int memberCount;
@@ -18,11 +18,11 @@ public class Channel extends BaseEntity {
     private Set<Message> messageList;
 
     public Channel(String channelName, String channelDescription,
-                   boolean isPrivate, User creator) {
+                   boolean isLock, User creator) {
         super();
         this.channelName = channelName;
         this.channelDescription = channelDescription;
-        this.isPrivate = false; // 공개 여부를 설정하지 않을 시, default는 공개(false)로 설정
+        this.isLock = false; // 공개 여부를 설정하지 않을 시, default는 공개(false)로 설정
         this.creator = creator;
         this.password = "";
         this.memberCount = 1; //처음 생성하면 생성자 1명만 채널에 참여되어있으므로 1로 초기화
@@ -32,11 +32,11 @@ public class Channel extends BaseEntity {
     }
 
     public Channel(String channelName, String channelDescription,
-                   boolean isPrivate, User creator, String password) {
+                   boolean isLock, User creator, String password) {
         super();
         this.channelName = channelName;
         this.channelDescription = channelDescription;
-        this.isPrivate = isPrivate;
+        this.isLock = isLock;
         this.creator = creator;
         this.password = password;
         this.memberCount = 1; //처음 생성하면 생성자 1명만 채널에 참여되어있으므로 1로 초기화
@@ -48,7 +48,7 @@ public class Channel extends BaseEntity {
                        boolean isPrivate) {
         this.channelName = channelName;
         this.channelDescription = channelDescription;
-        this.isPrivate = isPrivate;
+        this.isLock = isPrivate;
         setUpdatedAt();
     }
 
@@ -71,7 +71,7 @@ public class Channel extends BaseEntity {
         return "[Channel] {" +
                  channelName + '\'' +
                 " " + channelDescription + '\'' +
-                " " + isPrivate +
+                " " + isLock +
                 " " + creator +
                 " " + memberCount +
                 " memberList: " + memberList.stream().map(u -> u.getUserName()).collect(Collectors.toList())+

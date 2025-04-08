@@ -29,6 +29,8 @@ public class JavaApplication {
         User person4 = userService.create("조현아", "SB004", "!qwe0004", "sb004@gmail.com");
         User person5 = userService.create("정윤지", "SB005", "!qwe0005", "sb005@gmail.com");
 //        User person6 = userService.create("이주용", "SB005", "!qwe0", "sb006@gmail.com");  // 비밀번호가 허용된 양식(8자리 특수문자포함)을 만족x
+//        User person7 = userService.create("정윤지", "SB005", "!qwe0005", "sb005@gmail.com");
+
 
         System.out.println(person1.getUserName() + "님이 등록되었습니다");
         System.out.println(person2.getUserName() + "님이 등록되었습니다");
