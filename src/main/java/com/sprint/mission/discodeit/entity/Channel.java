@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Getter
 public class Channel extends BaseEntity {
 
     private String channelName;
@@ -39,34 +42,6 @@ public class Channel extends BaseEntity {
         this.memberCount = 1; //처음 생성하면 생성자 1명만 채널에 참여되어있으므로 1로 초기화
         this.memberList = new HashSet<User>();
         this.memberList.add(creator);
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public String getChannelDescription() {
-        return channelDescription;
-    }
-
-    public boolean getIsPrivate() {
-        return isPrivate;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public int getMemberCount() {
-        return memberCount;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Set<User> getMemberList() {
-        return memberList;
     }
 
     public void update(String channelName, String channelDescription,
