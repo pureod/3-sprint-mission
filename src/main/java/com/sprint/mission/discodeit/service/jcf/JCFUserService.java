@@ -51,12 +51,13 @@ public class JCFUserService implements UserService {
         userList.remove(user.getId());
     }
 
-    @Override //User의 password가 허용된 양식을 만족하는지 확인
+    //User의 password가 허용된 양식을 만족하는지 확인
     public boolean isValidPassword(String password) {
         String regex = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$";
         return password.matches(regex);
     }
 
+    //User의 Id가 중복되는지 확인ㅌ`
     public boolean isDuplicated(String userId) {
         return userList.values().stream().anyMatch(u -> u.getUserId().equals(userId));
     }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -40,7 +41,6 @@ public class JCFChannelService implements ChannelService {
         c.update(ModifiedChannelName, channelDescription, isPrivate);
     }
 
-
     @Override
     public void deleteById(User user, Channel channel) {
         if (channel.getCreator().equals(user)) {
@@ -49,7 +49,6 @@ public class JCFChannelService implements ChannelService {
         } else {
             System.out.println("You are not allowed to delete this channel");
         }
-
     }
 
     @Override
@@ -59,7 +58,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("Channel not found");
             return;
         }
-        if (c.isMember(user)) {
+        if (c.getMemberList().contains(user)) {
             System.out.println("You are already member of this channel");
             return;
         }
@@ -67,7 +66,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("Password is incorrect!!!");
             return;
         }
-        c.join(user);
+        channel.getMemberList().add(user);
         System.out.println(user.getUserName() + " Joined channel !!! [" + channel.getChannelName()+"]");
         System.out.println();
     }
@@ -80,14 +79,24 @@ public class JCFChannelService implements ChannelService {
             String answer = scanner.next();
             if (answer.equals("Y") || answer.equals("y")) {
                 System.out.println(user.getUserName() + "님이 " + channel.getChannelName() + "채널을 떠났습니다");
-                channel.leave(user);
+                channel.getMemberList().remove(user);
             } else {
                 System.out.println(user.getUserName() + "님은 아직 " + channel.getChannelName() + "채널에 머물러있습니다");
             }
         } else {
             System.out.println(user.getUserName() + "님이 " + channel.getChannelName() + "채널을 떠났습니다");
-            channel.leave(user);
+            channel.getMemberList().remove(user);
         }
+    }
+
+    @Override
+    public void addMessage(Channel channel,Message message) {
+        channel.getMessageList().add(message);
+    }
+
+    @Override
+    public void deleteMessage(Channel channel,Message message) {
+        channel.getMessageList().remove(message);
     }
 
 }

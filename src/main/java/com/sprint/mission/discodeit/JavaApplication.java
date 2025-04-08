@@ -28,8 +28,8 @@ public class JavaApplication {
         User person3 = userService.create("백은호", "SB003", "!qwe0003", "sb003@gmail.com");
         User person4 = userService.create("조현아", "SB004", "!qwe0004", "sb004@gmail.com");
         User person5 = userService.create("정윤지", "SB005", "!qwe0005", "sb005@gmail.com");
-//        User person6 = userService.create("이주용", "SB005", "!qwe0", "sb006@gmail.com");  // 비밀번호가 허용된 양식(8자리 특수문자포함)을 만족x
-//        User person7 = userService.create("정윤지", "SB005", "!qwe0005", "sb005@gmail.com");
+//        User person6 = userService.create("이주용", "SB005", "!qwe0", "sb006@gmail.com");  // 비밀번호가 8자리 특수문자포함 만족x
+//        User person7 = userService.create("정윤지", "SB005", "!qwe0005", "sb005@gmail.com"); // ID가 중복되는 경우
 
 
         System.out.println(person1.getUserName() + "님이 등록되었습니다");
@@ -137,7 +137,7 @@ public class JavaApplication {
         System.out.println("----------채널 멤버 추가 ----------");
         channelService.joinChannel(person2, ch3, "1234");
         channelService.joinChannel(person1, ch3, "1234");
-        System.out.println("총 " + ch3.getMemberCount() + "명의 사용자가 채널에 있습니다.");
+        System.out.println("총 " + ch3.getMemberList().size() + "명의 사용자가 채널에 있습니다.");
         System.out.println(ch3.getMemberList());
         System.out.println();
 
@@ -203,7 +203,7 @@ public class JavaApplication {
 
         //6. 삭제 후 조회
         System.out.println("----------메세지 삭제 후 데이터 조회----------");
-        messageService.readByChannelId(ch3.getId()).forEach(System.out::println);
+        messageService.readByChannelId(ch1.getId()).forEach(System.out::println);
         System.out.println();
 
 //        7. 유효성 검사 (현재 person4와 ch4 삭제 테스트로 인해 삭제된 상태)
