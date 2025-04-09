@@ -99,7 +99,7 @@ public class JavaApplication {
         log.info("----------채널 정보 수정----------");
         Channel targetChannel = ch3;
         log.info("수정 전 채널 정보: {}", channelService.readById(targetChannel.getId()));
-        channelService.update(targetChannel, "롤 듀오", "영웅호걸", true);
+        channelService.update(targetChannel, "롤 듀오", "영웅호걸", true, "1234");
 
         log.info("----------수정된 채널 조회----------");
         log.info("수정 후 채널 정보: {}", channelService.readById(targetChannel.getId()));

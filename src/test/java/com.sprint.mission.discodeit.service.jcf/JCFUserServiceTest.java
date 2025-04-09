@@ -73,7 +73,7 @@ public class JCFUserServiceTest {
 
         User user = userService.create("이주용", "sjo06102", "!qwe0123", "sjo06102@gmail.com");
         userService.deleteById(user);
-        assertNull(userService.readById(user.getId()));
+        assertNull(userService.readById(user.getId()),"삭제되지 않았습니다.");
 
     }
 

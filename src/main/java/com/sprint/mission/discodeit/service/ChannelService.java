@@ -17,7 +17,7 @@ public interface ChannelService {
     public List<Channel> readAll();
 
     public void update(Channel channel, String ModifiedChannelName, String channelDescription,
-                       boolean isPrivate);
+                       boolean isPrivate, String password);
 
     public void deleteById(User user, Channel channel);
 

@@ -18,8 +18,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel create(String channelName, String channelDescription,
-                          boolean isPrivate, User creator, String password) {
-        Channel channel = new Channel(channelName, channelDescription, isPrivate, creator, password);
+                          boolean isLock, User creator, String password) {
+        Channel channel = new Channel(channelName, channelDescription, isLock, creator, password);
         this.channelList.put(channel.getId(), channel);
         return channel;
     }
@@ -36,9 +36,9 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void update(Channel channel, String ModifiedChannelName, String channelDescription,
-                       boolean isPrivate) {
+                       boolean isLock, String password) {
         Channel c = channelList.get(channel.getId());
-        c.update(ModifiedChannelName, channelDescription, isPrivate);
+        c.update(ModifiedChannelName, channelDescription, isLock, password);
     }
 
     @Override

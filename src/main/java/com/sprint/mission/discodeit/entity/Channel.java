@@ -44,10 +44,11 @@ public class Channel extends BaseEntity {
     }
 
     public void update(String channelName, String channelDescription,
-                       boolean isLock) {
+                       boolean isLock, String password) {
         this.channelName = channelName;
         this.channelDescription = channelDescription;
         this.isLock = isLock;
+        this.password = password;
         setUpdatedAt();
     }
 
