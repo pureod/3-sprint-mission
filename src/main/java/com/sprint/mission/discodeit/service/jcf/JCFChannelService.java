@@ -77,7 +77,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("You are creator of this channel.\n Are you sure you want to leave? \n Y/N");
             Scanner scanner = new Scanner(System.in);
             String answer = scanner.next();
-            if (answer.equals("Y") || answer.equals("y")) {
+            if ("y".equalsIgnoreCase(answer)) {
                 System.out.println(user.getUserName() + "님이 " + channel.getChannelName() + "채널을 떠났습니다");
                 channel.getMemberList().remove(user);
             } else {
