@@ -27,6 +27,6 @@ public interface ChannelService {
 
     public void addMessage(Channel channel, Message message);
 
-    public void deleteMessage(Channel channel,Message message);
+    public void deleteMessage(Channel channel, Message message);
 
 }
