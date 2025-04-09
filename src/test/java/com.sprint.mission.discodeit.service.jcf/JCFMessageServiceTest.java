@@ -32,18 +32,18 @@ class JCFMessageServiceTest {
         user = userService.create("이주용", "sjo06102", "!qwe0123", "sjo06102@gmail.com");
         creator = userService.create("심슨", "simpson1", "!qwe0123", "sjo06102@naver.com");
         channel = channelService.create("스프링필드", "심슨네 가족", false, creator, "1234");
-        message = messageService.create(user,channel,"Why you little!!!!!!!!!!");
+        message = messageService.create(user, channel, "Why you little!!!!!!!!!!");
     }
 
     @Test
     void createMessage() {
         User createUser = userService.create("바트", "simpson3", "!qwe0123", "sjo06102@hufs.ac.kr");
-        Message createMessage = messageService.create(createUser,channel,"ascklasck~~!~!~");
+        Message createMessage = messageService.create(createUser, channel, "ascklasck~~!~!~");
 
         assertAll(
-                () -> assertNotNull(createMessage,"메세지가 생성되지 않았습니다."),
-                () -> assertEquals(createUser,createMessage.getUser(),"보낸이가 다릅니다"),
-                () -> assertEquals(channel,createMessage.getChannel(),"채널이 다릅니다")
+                () -> assertNotNull(createMessage, "메세지가 생성되지 않았습니다."),
+                () -> assertEquals(createUser, createMessage.getUser(), "보낸이가 다릅니다"),
+                () -> assertEquals(channel, createMessage.getChannel(), "채널이 다릅니다")
         );
     }
 
@@ -52,7 +52,8 @@ class JCFMessageServiceTest {
 
         List<Message> messageList = messageService.readByChannelId(channel.getId());
 
-        assertNotNull(messageList,"채널에 메세지가 존재하지 않습니다.");;
+        assertNotNull(messageList, "채널에 메세지가 존재하지 않습니다.");
+        ;
 
     }
 
@@ -71,7 +72,7 @@ class JCFMessageServiceTest {
         messageService.update(message.getId(), "Why you little!!!!!!!!!!".toUpperCase());
 
         assertAll(
-                () -> assertNotNull(message,"메세지가 Null입니다."),
+                () -> assertNotNull(message, "메세지가 Null입니다."),
                 () -> assertEquals("Why you little!!!!!!!!!!".toUpperCase(), messageService.readById(message.getId()).getContent())
         );
     }
