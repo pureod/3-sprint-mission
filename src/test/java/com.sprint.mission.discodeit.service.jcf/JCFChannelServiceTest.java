@@ -33,7 +33,7 @@ class JCFChannelServiceTest {
         String ChannelName = "롤 내전";
         String ChannelDescription = "수학과 내전 방입니다.";
         boolean isLock = false;
-        User creator =  userService.create("바트", "sjo06103", "!qwe1234", "sjo06102@naver.com");
+        User creator = userService.create("바트", "sjo06103", "!qwe1234", "sjo06102@naver.com");
         String password = "1234";
 
         Channel testchannel = channelService.create(ChannelName, ChannelDescription, isLock, creator, password);
@@ -53,8 +53,8 @@ class JCFChannelServiceTest {
     void findChannelByUUID() {
 
         assertAll(
-                () ->  assertNotNull(channelService.readById(channel.getId()),"찾는 채널이 존재하지 않습니다."),
-                () -> assertEquals(channel, channelService.readById(channel.getId()),"찾는 채널과 일치하지가 않습니다.")
+                () -> assertNotNull(channelService.readById(channel.getId()), "찾는 채널이 존재하지 않습니다."),
+                () -> assertEquals(channel, channelService.readById(channel.getId()), "찾는 채널과 일치하지가 않습니다.")
         );
 
     }
@@ -62,7 +62,7 @@ class JCFChannelServiceTest {
     @Test
     void findAllChannels() {
 
-        assertNotNull(channelService.readAll(),"채널 리스트가 Null입니다.");
+        assertNotNull(channelService.readAll(), "채널 리스트가 Null입니다.");
 
     }
 
@@ -74,7 +74,7 @@ class JCFChannelServiceTest {
 
 
         assertAll(
-                () -> assertNotNull(channel,"채널이 Null입니다."),
+                () -> assertNotNull(channel, "채널이 Null입니다."),
                 () -> assertEquals("!qwe0123", channelService.readById(channel.getId()).getPassword(),
                         "수정된 패스워드와 일치하지 않습니다.")
         );
