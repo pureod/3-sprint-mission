@@ -60,6 +60,6 @@ public class Channel extends BaseEntity {
                 " " + creator +
                 " " + memberList.size() +
                 " memberList: " + memberList.stream().map(u -> u.getUserName()).collect(Collectors.toList())+
-                '}';
+                '}' + '\n';
     }
 }

@@ -16,6 +16,15 @@ dependencies {
     //Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    // SLF4J API
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    // Log4j2 Binding (SLF4J <-> Log4j2 연결)
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0'
+    // Log4j2 Core
+    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    // Log4j2 API
+    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
 }
 
 test {
