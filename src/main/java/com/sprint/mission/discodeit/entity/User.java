@@ -30,7 +30,7 @@ public class User extends BaseEntity {
 
     @Override
     public String toString() {
-        return  "{" + userName +
+        return "{" + userName +
                 ", " + userId +
                 ", " + userPassword +
                 ", " + userEmail +

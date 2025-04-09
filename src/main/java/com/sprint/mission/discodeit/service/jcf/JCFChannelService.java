@@ -67,7 +67,7 @@ public class JCFChannelService implements ChannelService {
             return;
         }
         channel.getMemberList().add(user);
-        System.out.println(user.getUserName() + " Joined channel !!! [" + channel.getChannelName()+"]");
+        System.out.println(user.getUserName() + " Joined channel !!! [" + channel.getChannelName() + "]");
         System.out.println();
     }
 
@@ -90,12 +90,12 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void addMessage(Channel channel,Message message) {
+    public void addMessage(Channel channel, Message message) {
         channel.getMessageList().add(message);
     }
 
     @Override
-    public void deleteMessage(Channel channel,Message message) {
+    public void deleteMessage(Channel channel, Message message) {
         channel.getMessageList().remove(message);
     }
 

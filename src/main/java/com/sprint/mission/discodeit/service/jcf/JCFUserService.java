@@ -48,31 +48,16 @@ public class JCFUserService implements UserService {
 
     private void validateUserInfo(String userId, String userPassword, String userEmail) {
         if (userList.values().stream().anyMatch(u -> u.getUserId().equals(userId))) {
-            throw new IllegalArgumentException(userId+"는 이미 사용 중인 아이디입니다.");
+            throw new IllegalArgumentException(userId + "는 이미 사용 중인 아이디입니다.");
         }
         String regex = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$";
-        if (!userPassword.matches(regex)){
+        if (!userPassword.matches(regex)) {
             throw new IllegalArgumentException("비밀번호는 특수문자, 소문자, 숫자를 포함하여 8자리 이상이어야 합니다");
         }
         if (userList.values().stream().anyMatch(u -> u.getUserEmail().equals(userEmail))) {
-            throw new IllegalArgumentException(userEmail+"는 이미 사용 중인 이메일입니다.");
+            throw new IllegalArgumentException(userEmail + "는 이미 사용 중인 이메일입니다.");
         }
     }
-//
-//    //User의 password가 허용된 양식을 만족하는지 확인
-//    public boolean isValidPassword(String password) {
-//        String regex = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$";
-//        return password.matches(regex);
-//    }
-//
-//    //User의 Id가 중복되는지 확인ㅌ`
-//    public boolean isIdDuplicated(String userId) {
-//        return userList.values().stream().anyMatch(u -> u.getUserId().equals(userId));
-//    }
-//
-//    public boolean isEmailDuplicated(String userEmail) {
-//        return userList.values().stream().anyMatch(u -> u.getUserEmail().equals(userEmail));
-//    }
 }
 
 

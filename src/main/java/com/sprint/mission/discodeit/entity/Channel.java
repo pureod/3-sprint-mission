@@ -54,11 +54,11 @@ public class Channel extends BaseEntity {
     @Override
     public String toString() {
         return "[채널] {" + "\"" +
-                 channelName + "\"" +
+                channelName + "\"" +
                 ", " + isLock +
                 ", 어드민: [" + creator.getUserName() +
                 "], 멤버 수: " + memberList.size() +
-                ", 채널 멤버: " + memberList.stream().map(u -> u.getUserName()).collect(Collectors.toList())+
+                ", 채널 멤버: " + memberList.stream().map(u -> u.getUserName()).collect(Collectors.toList()) +
                 '}' + '\n';
     }
 }

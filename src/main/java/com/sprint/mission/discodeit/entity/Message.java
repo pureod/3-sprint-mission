@@ -32,6 +32,6 @@ public class Message extends BaseEntity {
                 ", userId: " + user.getUserName() +
                 ", channelId: " + channel.getChannelName() +
                 ", content: '" + content + '\'' +
-                '}'+ '\n';
+                '}' + '\n';
     }
 }
