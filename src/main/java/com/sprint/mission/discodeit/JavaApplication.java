@@ -70,7 +70,7 @@ public class JavaApplication {
         log.info("----------삭제 후 전체 유저 조회----------");
         userService.readAll().forEach(u -> log.info("{}", u));
 
-        return List.of(person1, person2, person3, person5);
+        return userService.readAll();
 
     }
 
@@ -123,7 +123,7 @@ public class JavaApplication {
         channelService.leave(userList.get(1), ch3);
         System.out.println();
 
-        return List.of(ch1, ch2, ch3, ch5);
+        return channelService.readAll();
     }
 
     private static void createMessageManagement(MessageService messageService, List<User> userList, List<Channel> channelList) {
@@ -144,7 +144,7 @@ public class JavaApplication {
         log.info("{} 채널에 {}님이 메세지를 보냈습니다.", message6.getChannel().getChannelName(), message6.getUser().getUserName());
         System.out.println();
 
-        log.info("----------전체 메세지 조회----------");
+        log.info("----------전체 메세지 조회----------"); //각 객체 리스트들을 LinkedHash로 변경하였기에 sorted는 삭제 해도 됨
         messageService.readAll().stream().sorted(Comparator.comparing(Message::getCreatedAt)).forEach(m -> log.info("{}", m));
 
         log.info("----------특정 채널 메세지 조회----------");

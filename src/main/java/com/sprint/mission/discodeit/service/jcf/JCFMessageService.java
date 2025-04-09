@@ -7,10 +7,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
@@ -20,7 +17,7 @@ public class JCFMessageService implements MessageService {
     private final ChannelService channelService;
 
     public JCFMessageService(UserService userService, ChannelService channelService) {
-        this.messageList = new HashMap<>();
+        this.messageList = new LinkedHashMap<>();
         this.userService = userService;
         this.channelService = channelService;
     }

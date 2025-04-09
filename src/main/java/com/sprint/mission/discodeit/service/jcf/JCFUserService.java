@@ -11,7 +11,7 @@ public class JCFUserService implements UserService {
     private final Map<UUID, User> userList;
 
     public JCFUserService() {
-        userList = new HashMap<>();
+        userList = new LinkedHashMap<>();
     }
 
     @Override
