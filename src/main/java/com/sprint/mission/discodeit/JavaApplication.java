@@ -9,16 +9,13 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Comparator;
 import java.util.List;
 
+@Log4j2
 public class JavaApplication {
-
-    private static final Logger log = LoggerFactory.getLogger(JavaApplication.class);
-
     public static void main(String[] args) {
 
         UserService userService = new JCFUserService();
