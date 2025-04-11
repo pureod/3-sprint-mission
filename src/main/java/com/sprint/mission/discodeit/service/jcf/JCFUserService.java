@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
@@ -19,6 +16,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User create(String userName, String userId, String userPassword, String userEmail) {
+        validateUserInfo(userId, userPassword, userEmail);
         User user = new User(userName, userId, userPassword, userEmail);
         userList.put(user.getId(), user);
         return user;
@@ -46,6 +44,19 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteById(User user) {
         userList.remove(user.getId());
+    }
+
+    private void validateUserInfo(String userId, String userPassword, String userEmail) {
+        if (userList.values().stream().anyMatch(u -> u.getUserId().equals(userId))) {
+            throw new IllegalArgumentException(userId + "는 이미 사용 중인 아이디입니다.");
+        }
+        String regex = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$";
+        if (!userPassword.matches(regex)) {
+            throw new IllegalArgumentException("비밀번호는 특수문자, 소문자, 숫자를 포함하여 8자리 이상이어야 합니다");
+        }
+        if (userList.values().stream().anyMatch(u -> u.getUserEmail().equals(userEmail))) {
+            throw new IllegalArgumentException(userEmail + "는 이미 사용 중인 이메일입니다.");
+        }
     }
 }
 

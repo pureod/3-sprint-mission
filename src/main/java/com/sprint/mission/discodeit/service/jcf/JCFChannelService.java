@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -17,8 +18,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel create(String channelName, String channelDescription,
-                          boolean isPrivate, User creator, String password) {
-        Channel channel = new Channel(channelName, channelDescription, isPrivate, creator, password);
+                          boolean isLock, User creator, String password) {
+        Channel channel = new Channel(channelName, channelDescription, isLock, creator, password);
         this.channelList.put(channel.getId(), channel);
         return channel;
     }
@@ -35,11 +36,10 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void update(Channel channel, String ModifiedChannelName, String channelDescription,
-                       boolean isPrivate) {
+                       boolean isLock, String password) {
         Channel c = channelList.get(channel.getId());
-        c.update(ModifiedChannelName, channelDescription, isPrivate);
+        c.update(ModifiedChannelName, channelDescription, isLock, password);
     }
-
 
     @Override
     public void deleteById(User user, Channel channel) {
@@ -49,7 +49,6 @@ public class JCFChannelService implements ChannelService {
         } else {
             System.out.println("You are not allowed to delete this channel");
         }
-
     }
 
     @Override
@@ -59,16 +58,16 @@ public class JCFChannelService implements ChannelService {
             System.out.println("Channel not found");
             return;
         }
-        if (c.isMember(user)) {
+        if (c.getMemberList().contains(user)) {
             System.out.println("You are already member of this channel");
             return;
         }
-        if (!c.getPassword().equals(password) && c.getIsPrivate()) {
+        if (!c.getPassword().equals(password) && c.isLock()) {
             System.out.println("Password is incorrect!!!");
             return;
         }
-        c.join(user);
-        System.out.println(user.getUserName() + " Joined channel !!! [" + channel.getChannelName()+"]");
+        channel.getMemberList().add(user);
+        System.out.println(user.getUserName() + " Joined channel !!! [" + channel.getChannelName() + "]");
         System.out.println();
     }
 
@@ -78,16 +77,26 @@ public class JCFChannelService implements ChannelService {
             System.out.println("You are creator of this channel.\n Are you sure you want to leave? \n Y/N");
             Scanner scanner = new Scanner(System.in);
             String answer = scanner.next();
-            if (answer.equals("Y") || answer.equals("y")) {
+            if ("y".equalsIgnoreCase(answer)) {
                 System.out.println(user.getUserName() + "님이 " + channel.getChannelName() + "채널을 떠났습니다");
-                channel.leave(user);
+                channel.getMemberList().remove(user);
             } else {
                 System.out.println(user.getUserName() + "님은 아직 " + channel.getChannelName() + "채널에 머물러있습니다");
             }
         } else {
             System.out.println(user.getUserName() + "님이 " + channel.getChannelName() + "채널을 떠났습니다");
-            channel.leave(user);
+            channel.getMemberList().remove(user);
         }
+    }
+
+    @Override
+    public void addMessage(Channel channel, Message message) {
+        channel.getMessageList().add(message);
+    }
+
+    @Override
+    public void deleteMessage(Channel channel, Message message) {
+        channel.getMessageList().remove(message);
     }
 
 }
