@@ -13,7 +13,7 @@ public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> channelList;
 
     public JCFChannelService() {
-        channelList = new HashMap<>();
+        channelList = new LinkedHashMap<>();
     }
 
     @Override

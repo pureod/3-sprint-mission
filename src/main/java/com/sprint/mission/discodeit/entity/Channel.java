@@ -24,7 +24,7 @@ public class Channel extends BaseEntity {
         this.isLock = false; // 공개 여부를 설정하지 않을 시, default는 공개(false)로 설정
         this.creator = creator;
         this.password = "";
-        this.memberList = new HashSet<User>();
+        this.memberList = new LinkedHashSet<User>();
         this.memberList.add(creator);
         this.messageList = new ArrayList<Message>();
 
