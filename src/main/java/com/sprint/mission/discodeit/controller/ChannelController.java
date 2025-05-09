@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,6 +29,7 @@ public class ChannelController {
 //            , method = RequestMethod.POST
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @ResponseBody
     public ResponseEntity<Channel> createPublicChannel(
             @RequestPart("request") PublicChannelCreateRequest request
     ) {
@@ -45,6 +43,7 @@ public class ChannelController {
 //            , method = RequestMethod.POST
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @ResponseBody
     public ResponseEntity<Channel> createPrivateChannel(
             @RequestPart("request") PrivateChannelCreateRequest request
     ) {
@@ -58,6 +57,7 @@ public class ChannelController {
 //            , method = RequestMethod.PUT
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @ResponseBody
     public ResponseEntity<Channel> updateChannel(
             @RequestParam("channelId") UUID channelId,
             @RequestPart("request") PublicChannelUpdateRequest request
@@ -73,6 +73,7 @@ public class ChannelController {
             path = "/delete"
 //            , method = RequestMethod.DELETE
     )
+    @ResponseBody
     public ResponseEntity<String> deleteChannel(
             @RequestParam("channelId") UUID channelId
     ) {
@@ -89,6 +90,7 @@ public class ChannelController {
             path = "/search"
             , method = RequestMethod.GET
     )
+    @ResponseBody
     public ResponseEntity<List<ChannelDto>> getUserChannels(
             @RequestParam("userId") UUID userId
     ) {

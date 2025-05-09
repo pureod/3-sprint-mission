@@ -10,10 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -31,6 +28,7 @@ public class MessageController {
             , method = RequestMethod.POST
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @ResponseBody
     public ResponseEntity<Message> send(
             @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
@@ -52,6 +50,7 @@ public class MessageController {
             , method = RequestMethod.PUT
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @ResponseBody
     public ResponseEntity<Message> update(
             @RequestParam("messageId") UUID messageId,
             @RequestPart("request") MessageUpdateRequest request
@@ -68,6 +67,7 @@ public class MessageController {
             path = "/delete"
             , method = RequestMethod.DELETE
     )
+    @ResponseBody
     public ResponseEntity<String> delete(
             @RequestParam("messageId") UUID messageId) {
 
@@ -84,6 +84,7 @@ public class MessageController {
             path = "/search"
             , method = RequestMethod.GET
     )
+    @ResponseBody
     public ResponseEntity<List<Message>> search(UUID channelId) {
 
         List<Message> messages = messageService.findAllByChannelId(channelId);
