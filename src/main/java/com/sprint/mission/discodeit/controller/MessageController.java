@@ -1,0 +1,110 @@
+package com.sprint.mission.discodeit.controller;
+
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.*;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/api/message")
+public class MessageController {
+
+    private final MessageService messageService;
+
+    @RequestMapping(
+            path = "/send"
+            , method = RequestMethod.POST
+            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<Message> send(
+            @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+            @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+    ) {
+        List<BinaryContentCreateRequest> attachmentRequests = new ArrayList<>();
+
+        if (attachments != null) {
+            for (MultipartFile file : attachments) {
+                resolveAttachmentRequest(file).ifPresent(attachmentRequests::add);
+            }
+        }
+
+        Message created = messageService.create(messageCreateRequest, attachmentRequests);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @RequestMapping(
+            path = "/update"
+            , method = RequestMethod.PUT
+            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<Message> update(
+            @RequestParam("messageId") UUID messageId,
+            @RequestPart("request") MessageUpdateRequest request
+    ) {
+        try {
+            Message updatedmessage = messageService.update(messageId, request);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedmessage);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @RequestMapping(
+            path = "/delete"
+            , method = RequestMethod.DELETE
+    )
+    public ResponseEntity<String> delete(
+            @RequestParam("messageId") UUID messageId) {
+
+        try {
+            messageService.delete(messageId);
+            return ResponseEntity.ok("[From. Server] 메세지 삭제 완료");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("[From. Server] 해당 메세지를 찾을 수 없습니다.");
+        }
+
+    }
+
+    @RequestMapping(
+            path = "/search"
+            , method = RequestMethod.GET
+    )
+    public ResponseEntity<List<Message>> search(UUID channelId) {
+
+        List<Message> messages = messageService.findAllByChannelId(channelId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(messages);
+    }
+
+
+    private Optional<BinaryContentCreateRequest> resolveAttachmentRequest(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+            ));
+        } catch (IOException e) {
+            throw new RuntimeException("첨부파일 처리 중 오류 발생: " + file.getOriginalFilename(), e);
+        }
+    }
+
+}
