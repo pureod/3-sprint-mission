@@ -30,7 +30,7 @@ public class AuthController {
             , method = RequestMethod.POST
             , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> login(
-            @RequestPart LoginRequest loginRequest) {
+            @RequestPart("loginRequest") LoginRequest loginRequest) {
 
         try {
             User user = authService.login(loginRequest);
