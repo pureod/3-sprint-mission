@@ -24,10 +24,10 @@ public class ReadStatusController {
     @RequestMapping(
             path = "/create"
             , method = RequestMethod.POST
-            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    )
     @ResponseBody
     public ResponseEntity<ReadStatus> create(
-            @RequestPart("request") ReadStatusCreateRequest request
+            @RequestBody ReadStatusCreateRequest request
     ) {
         ReadStatus createdStatus = readStatusService.create(request);
 
@@ -37,12 +37,11 @@ public class ReadStatusController {
     @RequestMapping(
             path = "/update"
             , method = RequestMethod.PUT
-            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @ResponseBody
     public ResponseEntity<ReadStatus> update(
             @RequestParam("readStatusId") UUID readStatusId,
-            @RequestPart("request") ReadStatusUpdateRequest request
+            @RequestBody ReadStatusUpdateRequest request
     ) {
 
         ReadStatus updatedStatus = readStatusService.update(readStatusId, request);

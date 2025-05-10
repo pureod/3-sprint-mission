@@ -27,11 +27,10 @@ public class ChannelController {
     @RequestMapping(
             path = "/createPublic"
 //            , method = RequestMethod.POST
-            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @ResponseBody
     public ResponseEntity<Channel> createPublicChannel(
-            @RequestPart("request") PublicChannelCreateRequest request
+            @RequestBody PublicChannelCreateRequest request
     ) {
         Channel createdChannel = channelService.create(request);
 
@@ -41,11 +40,10 @@ public class ChannelController {
     @RequestMapping(
             path = "/createPrivate"
 //            , method = RequestMethod.POST
-            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @ResponseBody
     public ResponseEntity<Channel> createPrivateChannel(
-            @RequestPart("request") PrivateChannelCreateRequest request
+            @RequestBody PrivateChannelCreateRequest request
     ) {
         Channel createdChannel = channelService.create(request);
 
@@ -55,12 +53,11 @@ public class ChannelController {
     @RequestMapping(
             path = "/update"
 //            , method = RequestMethod.PUT
-            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @ResponseBody
     public ResponseEntity<Channel> updateChannel(
             @RequestParam("channelId") UUID channelId,
-            @RequestPart("request") PublicChannelUpdateRequest request
+            @RequestBody PublicChannelUpdateRequest request
     ) {
 
         Channel updatedChannel = channelService.update(channelId, request);
@@ -77,13 +74,17 @@ public class ChannelController {
     public ResponseEntity<String> deleteChannel(
             @RequestParam("channelId") UUID channelId
     ) {
-        try {
-            channelService.delete(channelId);
-            return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 채널 삭제 성공!!!");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("[From. Server] 채널 삭제 실패 - 존재하지 않는 채널 ID: " + channelId);
-        }
+
+        channelService.delete(channelId);
+        return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 채널 삭제 성공!!!");
+
+//        try {
+//            channelService.delete(channelId);
+//            return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 채널 삭제 성공!!!");
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body("[From. Server] 채널 삭제 실패 - 존재하지 않는 채널 ID: " + channelId);
+//        }
     }
 
     @RequestMapping(

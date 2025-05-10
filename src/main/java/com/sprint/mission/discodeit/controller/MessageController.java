@@ -48,19 +48,22 @@ public class MessageController {
     @RequestMapping(
             path = "/update"
             , method = RequestMethod.PUT
-            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @ResponseBody
     public ResponseEntity<Message> update(
             @RequestParam("messageId") UUID messageId,
-            @RequestPart("request") MessageUpdateRequest request
+            @RequestBody MessageUpdateRequest request
     ) {
-        try {
-            Message updatedmessage = messageService.update(messageId, request);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedmessage);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+
+        Message updatedmessage = messageService.update(messageId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedmessage);
+
+//        try {
+//            Message updatedmessage = messageService.update(messageId, request);
+//            return ResponseEntity.status(HttpStatus.OK).body(updatedmessage);
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//        }
     }
 
     @RequestMapping(
@@ -69,14 +72,18 @@ public class MessageController {
     )
     @ResponseBody
     public ResponseEntity<String> delete(
-            @RequestParam("messageId") UUID messageId) {
+            @RequestParam("messageId") UUID messageId
+    ) {
 
-        try {
-            messageService.delete(messageId);
-            return ResponseEntity.ok("[From. Server] 메세지 삭제 완료");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("[From. Server] 해당 메세지를 찾을 수 없습니다.");
-        }
+        messageService.delete(messageId);
+        return ResponseEntity.ok("[From. Server] 메세지 삭제 완료");
+
+//        try {
+//            messageService.delete(messageId);
+//            return ResponseEntity.ok("[From. Server] 메세지 삭제 완료");
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("[From. Server] 해당 메세지를 찾을 수 없습니다.");
+//        }
 
     }
 
@@ -85,7 +92,9 @@ public class MessageController {
             , method = RequestMethod.GET
     )
     @ResponseBody
-    public ResponseEntity<List<Message>> search(UUID channelId) {
+    public ResponseEntity<List<Message>> search(
+            @RequestParam("channelId") UUID channelId
+    ) {
 
         List<Message> messages = messageService.findAllByChannelId(channelId);
 

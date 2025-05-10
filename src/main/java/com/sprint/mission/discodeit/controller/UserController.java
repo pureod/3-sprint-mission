@@ -93,13 +93,15 @@ public class UserController {
     public ResponseEntity<String> delete(
             @RequestParam("userId") UUID userId
     ) {
-        try {
-            userService.delete(userId);
-            return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 사용자 정보 삭제 성공!!!");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("[From. Server] 사용자 정보 삭제 실패 - 존재하지 않는 ID: " + userId);
-        }
+        userService.delete(userId);
+        return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 사용자 정보 삭제 성공!!!");
+//        try {
+//            userService.delete(userId);
+//            return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 사용자 정보 삭제 성공!!!");
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body("[From. Server] 사용자 정보 삭제 실패 - 존재하지 않는 ID: " + userId);
+//        }
 
     }
 

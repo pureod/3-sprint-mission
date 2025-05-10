@@ -24,23 +24,28 @@ public class AuthController {
 
     @RequestMapping(
             path = "/login"
-            , method = RequestMethod.POST
-            , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+            , method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<?> login(
-            @RequestPart("loginRequest") LoginRequest loginRequest) {
+            @RequestBody LoginRequest loginRequest) {
 
-        try {
-            User user = authService.login(loginRequest);
-            UserDto userDto = userService.find(user.getId());
 
-            return ResponseEntity.status(HttpStatus.OK).body(userDto);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("존재하지 않는 회원입니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("비밀번호가 일치하지 않습니다.");
-        }
+        User user = authService.login(loginRequest);
+        UserDto userDto = userService.find(user.getId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(userDto);
+
+//        try {
+//            User user = authService.login(loginRequest);
+//            UserDto userDto = userService.find(user.getId());
+//
+//            return ResponseEntity.status(HttpStatus.OK).body(userDto);
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body("존재하지 않는 회원입니다.");
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body("비밀번호가 일치하지 않습니다.");
+//        }
     }
 }
