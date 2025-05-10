@@ -76,7 +76,7 @@ public class ChannelController {
     ) {
 
         channelService.delete(channelId);
-        return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 채널 삭제 성공!!!");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("[From. Server] 채널 삭제 성공!!!");
 
 //        try {
 //            channelService.delete(channelId);

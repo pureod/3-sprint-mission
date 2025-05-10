@@ -23,7 +23,7 @@ public class BinaryContentController {
             , method = RequestMethod.GET
     )
     @ResponseBody
-    public ResponseEntity<BinaryContent> findById(
+    public ResponseEntity<BinaryContent> find(
             @RequestParam("id") UUID id
     ) {
         BinaryContent content = binaryContentService.find(id);

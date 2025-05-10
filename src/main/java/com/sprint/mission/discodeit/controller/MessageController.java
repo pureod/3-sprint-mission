@@ -76,7 +76,7 @@ public class MessageController {
     ) {
 
         messageService.delete(messageId);
-        return ResponseEntity.ok("[From. Server] 메세지 삭제 완료");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("[From. Server] 메세지 삭제 완료");
 
 //        try {
 //            messageService.delete(messageId);
