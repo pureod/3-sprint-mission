@@ -24,9 +24,9 @@ public class BinaryContentController {
     )
     @ResponseBody
     public ResponseEntity<BinaryContent> find(
-            @RequestParam("id") UUID id
+            @RequestParam("binaryContentId") UUID binaryContentId
     ) {
-        BinaryContent content = binaryContentService.find(id);
+        BinaryContent content = binaryContentService.find(binaryContentId);
 
         return ResponseEntity.status(HttpStatus.OK).body(content);
     }
