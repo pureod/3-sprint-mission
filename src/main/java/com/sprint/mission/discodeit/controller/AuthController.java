@@ -26,7 +26,7 @@ public class AuthController {
             path = "/login"
             , method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<?> login(
+    public ResponseEntity<UserDto> login(
             @RequestBody LoginRequest loginRequest) {
 
 

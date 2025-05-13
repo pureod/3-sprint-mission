@@ -36,7 +36,7 @@ public class BinaryContentController {
             , method = RequestMethod.GET
     )
     @ResponseBody
-    public ResponseEntity<?> findAll(
+    public ResponseEntity<List<BinaryContent>> findAll(
             @RequestParam("ids") List<UUID> ids
     ) {
         List<BinaryContent> contents = binaryContentService.findAllByIdIn(ids);
