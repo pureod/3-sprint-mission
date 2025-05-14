@@ -60,8 +60,6 @@ public class UserController {
 
         User createdUser = userService.create(userCreateRequest, profileRequest);
 
-        System.out.println("createdUser.getId() = " + createdUser.getId());
-
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 

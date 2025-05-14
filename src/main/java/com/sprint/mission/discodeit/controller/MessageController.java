@@ -58,12 +58,6 @@ public class MessageController {
         Message updatedmessage = messageService.update(messageId, request);
         return ResponseEntity.status(HttpStatus.OK).body(updatedmessage);
 
-//        try {
-//            Message updatedmessage = messageService.update(messageId, request);
-//            return ResponseEntity.status(HttpStatus.OK).body(updatedmessage);
-//        } catch (NoSuchElementException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
     }
 
     @RequestMapping(
