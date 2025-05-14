@@ -95,13 +95,6 @@ public class UserController {
     ) {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("[From. Server] 사용자 정보 삭제 성공!!!");
-//        try {
-//            userService.delete(userId);
-//            return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 사용자 정보 삭제 성공!!!");
-//        } catch (NoSuchElementException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("[From. Server] 사용자 정보 삭제 실패 - 존재하지 않는 ID: " + userId);
-//        }
 
     }
 

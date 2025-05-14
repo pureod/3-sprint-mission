@@ -78,13 +78,6 @@ public class MessageController {
         messageService.delete(messageId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("[From. Server] 메세지 삭제 완료");
 
-//        try {
-//            messageService.delete(messageId);
-//            return ResponseEntity.ok("[From. Server] 메세지 삭제 완료");
-//        } catch (NoSuchElementException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("[From. Server] 해당 메세지를 찾을 수 없습니다.");
-//        }
-
     }
 
     @RequestMapping(

@@ -35,17 +35,5 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.OK).body(userDto);
 
-//        try {
-//            User user = authService.login(loginRequest);
-//            UserDto userDto = userService.find(user.getId());
-//
-//            return ResponseEntity.status(HttpStatus.OK).body(userDto);
-//        } catch (NoSuchElementException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("존재하지 않는 회원입니다.");
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body("비밀번호가 일치하지 않습니다.");
-//        }
     }
 }

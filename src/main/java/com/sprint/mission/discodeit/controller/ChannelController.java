@@ -78,13 +78,6 @@ public class ChannelController {
         channelService.delete(channelId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("[From. Server] 채널 삭제 성공!!!");
 
-//        try {
-//            channelService.delete(channelId);
-//            return ResponseEntity.status(HttpStatus.OK).body("[From. Server] 채널 삭제 성공!!!");
-//        } catch (NoSuchElementException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("[From. Server] 채널 삭제 실패 - 존재하지 않는 채널 ID: " + channelId);
-//        }
     }
 
     @RequestMapping(
