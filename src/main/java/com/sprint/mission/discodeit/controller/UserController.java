@@ -94,7 +94,7 @@ public class UserController {
             @RequestParam("userId") UUID userId
     ) {
         userService.delete(userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("[From. Server] 사용자 정보 삭제 성공!!!");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
 
