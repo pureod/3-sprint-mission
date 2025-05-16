@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +31,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -192,12 +192,16 @@ public class UserController {
   })
   @PatchMapping(path = "/{userId}/userStatus")
   public ResponseEntity<UserStatus> userStatusUpdate(
-      @PathVariable("userId") UUID userId
+      @Parameter(name = "userId",
+          description = "상태를 변경할 UserID",
+          required = true) @PathVariable("userId") UUID userId,
+      @RequestBody UserStatusUpdateRequest request
   ) {
-    UserStatus userStatus = userStatusService.updateByUserId(userId,
-        new UserStatusUpdateRequest(Instant.now()));
+    UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedUserStatus);
 
-    return ResponseEntity.status(HttpStatus.OK).body(userStatus);
   }
 
 
