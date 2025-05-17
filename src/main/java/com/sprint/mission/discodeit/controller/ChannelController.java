@@ -66,7 +66,6 @@ public class ChannelController {
           schema = @Schema(implementation = Channel.class)
       )
   )
-
   @PostMapping("/private")
   public ResponseEntity<Channel> createPrivate(
       @RequestBody PrivateChannelCreateRequest request
@@ -77,7 +76,6 @@ public class ChannelController {
   }
 
   @Operation(summary = "Channel 정보 수정")
-  @Parameter(name = "channelId", description = "수정할 Channel ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "200",
@@ -106,7 +104,10 @@ public class ChannelController {
   })
   @PatchMapping("/{channelId}")
   public ResponseEntity<Channel> update(
-      @PathVariable("channelId") UUID channelId,
+      @Parameter(
+          name = "channelId",
+          description = "수정할 Channel ID",
+          required = true) @PathVariable("channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest request
   ) {
     Channel updatedChannel = channelService.update(channelId, request);
@@ -116,7 +117,6 @@ public class ChannelController {
 
 
   @Operation(summary = "Channel 삭제")
-  @Parameter(name = "channelId", description = "삭제할 Channel ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "204",
@@ -132,17 +132,18 @@ public class ChannelController {
       )
   })
   @DeleteMapping("/{channelId}")
-  public ResponseEntity<String> delete(
-      @PathVariable("channelId") UUID channelId
+  public ResponseEntity<Void> delete(
+      @Parameter(
+          name = "channelId",
+          description = "삭제할 Channel ID",
+          required = true) @PathVariable("channelId") UUID channelId
   ) {
-
     channelService.delete(channelId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
   }
 
   @Operation(summary = "User가 참여 중인 Channel 목록 조회")
-  @Parameter(name = "userId", description = "조회할 User ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "200",
@@ -154,7 +155,7 @@ public class ChannelController {
       )
   })
   @GetMapping
-  public ResponseEntity<List<ChannelDto>> findAllbyUserId(
+  public ResponseEntity<List<ChannelDto>> findAllByUserId(
       @Parameter(name = "userId", description = "조회할 User ID", required = true)
       @RequestParam("userId") UUID userId
   ) {

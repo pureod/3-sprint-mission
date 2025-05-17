@@ -108,7 +108,6 @@ public class UserController {
   }
 
   @Operation(summary = "User 정보 수정")
-  @Parameter(name = "userId", description = "수정할 User ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "200",
@@ -137,7 +136,10 @@ public class UserController {
       , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
   )
   public ResponseEntity<User> update(
-      @PathVariable("userId") UUID userId,
+      @Parameter(
+          name = "userId",
+          description = "수정할 User ID",
+          required = true) @PathVariable("userId") UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
@@ -151,7 +153,6 @@ public class UserController {
   }
 
   @Operation(summary = "User 삭제")
-  @Parameter(name = "userId", description = "삭제할 User ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "204",
@@ -167,12 +168,14 @@ public class UserController {
       )
   })
   @DeleteMapping(path = "/{userId}")
-  public ResponseEntity<String> delete(
-      @PathVariable("userId") UUID userId
+  public ResponseEntity<Void> delete(
+      @Parameter(
+          name = "userId",
+          description = "삭제할 User ID",
+          required = true) @PathVariable("userId") UUID userId
   ) {
     userService.delete(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
   }
 
   @Operation(summary = "User 온라인 상태 업데이트")

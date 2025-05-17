@@ -80,7 +80,6 @@ public class MessageController {
   }
 
   @Operation(summary = "Message 내용 수정")
-  @Parameter(name = "messageId", description = "수정할 Message ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "200",
@@ -101,7 +100,10 @@ public class MessageController {
   })
   @PatchMapping("/{messageId}")
   public ResponseEntity<Message> update(
-      @PathVariable("messageId") UUID messageId,
+      @Parameter(
+          name = "messageId",
+          description = "수정할 Message ID",
+          required = true) @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request
   ) {
 
@@ -111,7 +113,6 @@ public class MessageController {
   }
 
   @Operation(summary = "Message 삭제")
-  @Parameter(name = "messageId", description = "삭제할 Message ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "204",
@@ -128,18 +129,19 @@ public class MessageController {
   })
   @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> delete(
-      @PathVariable("messageId") UUID messageId
+      @Parameter(
+          name = "messageId",
+          description = "삭제할 Message ID",
+          required = true) @PathVariable("messageId") UUID messageId
   ) {
 
     messageService.delete(messageId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
   }
 
   @Operation(
       summary = "Channel의 Message 목록 조회"
   )
-  @Parameter(name = "channelId", description = "조회할 Channel ID", required = true)
   @ApiResponses({
       @ApiResponse(
           responseCode = "200",
@@ -152,10 +154,11 @@ public class MessageController {
   })
   @GetMapping
   public ResponseEntity<List<Message>> findAllByChannelId
-      (
-          @RequestParam("channelId") UUID channelId
+      (@Parameter(
+          name = "channelId",
+          description = "조회할 Channel ID",
+          required = true) @RequestParam("channelId") UUID channelId
       ) {
-
     List<Message> messages = messageService.findAllByChannelId(channelId);
 
     return ResponseEntity.status(HttpStatus.OK).body(messages);
