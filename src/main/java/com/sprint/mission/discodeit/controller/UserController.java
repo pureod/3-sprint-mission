@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -95,7 +96,7 @@ public class UserController {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE // 바이너리와 아닌 것이 같이 들어올 수 있으므로 멀티파트로~
   )
   public ResponseEntity<User> create(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest, //text
+      @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest, //text
       @RequestPart(value = "profile", required = false) MultipartFile profile //imag&file
   ) {
     Optional<BinaryContentCreateRequest> profileRequest =
@@ -140,7 +141,7 @@ public class UserController {
           name = "userId",
           description = "수정할 User ID",
           required = true) @PathVariable("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     Optional<BinaryContentCreateRequest> profileRequest =
