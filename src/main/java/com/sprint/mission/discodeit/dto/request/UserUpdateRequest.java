@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 
 public record UserUpdateRequest(
     @NotBlank(message = "사용자 이름은 필수입니다")
-    @Size(min = 2, max = 10, message = "사용자 이름은 1~10자 사이여야 합니다")
+    @Size(min = 2, max = 10, message = "사용자 이름은 2~10자 사이여야 합니다")
     String newUsername,
 
     @NotBlank(message = "이메일은 필수입니다")
