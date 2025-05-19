@@ -176,7 +176,8 @@ public class MessageController {
           file.getBytes()
       ));
     } catch (IOException e) {
-      throw new RuntimeException("첨부파일 처리 중 오류 발생: " + file.getOriginalFilename(), e);
+      throw new RuntimeException(
+          String.format("Error processing attachment: %s", file.getOriginalFilename()), e);
     }
   }
 

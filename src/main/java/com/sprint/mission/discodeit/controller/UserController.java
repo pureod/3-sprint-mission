@@ -224,7 +224,8 @@ public class UserController {
         );
         return Optional.of(binaryContentCreateRequest);
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        throw new RuntimeException(
+            "An error occurred while processing the profile image." + e.getMessage(), e);
       }
     }
   }
