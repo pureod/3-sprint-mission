@@ -1,45 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
-    // userId channelId content
-    private User user;
-    private Channel channel;
+@Getter
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
 
-    public Message(User user, Channel channel, String content) {
-        this.user = user;
-        this.channel = channel;
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.content = content;
-    }
-    public User getUser() {
-        return user;
-    }
-
-    public Channel getChannel() {
-        return channel;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
-    public String getContent() {
-        return content;
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    public void update(String content) {
-        this.content = content;
-        setUpdatedAt();
-    }
-
-    @Override
-    public String toString() {
-        return "[Message] " +
-                " time: " + getUpdatedAt() +
-                ", userId: " + user.getUserName() +
-                ", channelId: " + channel.getChannelName() +
-                ", content: '" + content + '\'' +
-                '}';
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
