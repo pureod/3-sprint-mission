@@ -9,4 +9,4 @@ discodeit:
 
 logging:
   level:
-    com.sprint.mission.discodeit: Info
+    com.sprint.mission.discodeit: INFO
