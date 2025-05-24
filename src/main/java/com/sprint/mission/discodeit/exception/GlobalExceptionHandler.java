@@ -35,9 +35,9 @@ public class GlobalExceptionHandler {
     return sendErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
   }
 
-  // 파일 IO에 문제가 생겼을 경우
+  // 실행 도중에 문제가 생겼을 경우
   @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<ErrorResponse> runtimeExceptionExceptionHandler(IOException e) {
+  public ResponseEntity<ErrorResponse> runtimeExceptionExceptionHandler(RuntimeException e) {
     return sendErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
   }
 
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     String message = e.getBindingResult().getFieldErrors().stream()
         .map(error -> error.getField() + ": " + error.getDefaultMessage())
         .collect(Collectors.joining(", "));
-    return sendErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    return sendErrorResponse(HttpStatus.BAD_REQUEST, message);
   }
 
 }
