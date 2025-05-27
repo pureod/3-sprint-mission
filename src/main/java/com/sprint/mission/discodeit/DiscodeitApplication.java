@@ -25,13 +25,15 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
+@EnableJpaAuditing
 public class DiscodeitApplication {
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		SpringApplication.run(DiscodeitApplication.class, args);
+    SpringApplication.run(DiscodeitApplication.class, args);
 
-	}
+  }
 }
