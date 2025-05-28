@@ -9,10 +9,14 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "user_statuses")

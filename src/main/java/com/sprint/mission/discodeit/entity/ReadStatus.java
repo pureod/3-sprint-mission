@@ -7,6 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import javax.naming.Name;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @NoArgsConstructor
 @Entity
