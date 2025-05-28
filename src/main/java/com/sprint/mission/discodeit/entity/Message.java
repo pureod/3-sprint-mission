@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @NoArgsConstructor
 @Entity
