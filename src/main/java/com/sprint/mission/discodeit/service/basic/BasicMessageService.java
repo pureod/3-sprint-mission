@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -7,12 +8,14 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,10 +33,11 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final MessageMapper messageMapper;
 
   @Override
   @Transactional
-  public Message create(MessageCreateRequest messageCreateRequest,
+  public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
 
     UUID channelId = messageCreateRequest.channelId();
@@ -68,29 +72,35 @@ public class BasicMessageService implements MessageService {
         .attachments(attachments)
         .build();
 
-    return messageRepository.save(message);
+    Message savedMessage = messageRepository.save(message);
+
+    return messageMapper.toDto(savedMessage);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Message find(UUID messageId) {
+  public MessageDto find(UUID messageId) {
 
-    return messageRepository.findById(messageId)
+    Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
+    return messageMapper.toDto(message);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<Message> findAllByChannelId(UUID channelId) {
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
 
-    return messageRepository.findAllByChannelId(channelId);
+    return messageRepository.findAllByChannelId(channelId)
+        .stream()
+        .map(messageMapper::toDto)
+        .collect(Collectors.toList());
   }
 
   @Override
   @Transactional
-  public Message update(UUID messageId, MessageUpdateRequest request) {
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     String newContent = request.newContent();
 
     Message message = messageRepository.findById(messageId)
@@ -99,7 +109,7 @@ public class BasicMessageService implements MessageService {
 
     message.update(newContent);
 
-    return message;
+    return messageMapper.toDto(message);
   }
 
   @Override
@@ -111,5 +121,5 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.delete(message);
   }
-  
+
 }
