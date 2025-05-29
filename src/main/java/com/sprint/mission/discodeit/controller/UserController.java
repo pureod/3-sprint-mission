@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
@@ -95,7 +96,7 @@ public class UserController {
   @PostMapping(
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE // 바이너리와 아닌 것이 같이 들어올 수 있으므로 멀티파트로~
   )
-  public ResponseEntity<User> create(
+  public ResponseEntity<UserDto> create(
 //      @Valid
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest, //text
       @RequestPart(value = "profile", required = false) MultipartFile profile //imag&file
@@ -104,7 +105,7 @@ public class UserController {
         Optional.ofNullable(profile)
             .flatMap(this::resolveProfileRequest);
 
-    User createdUser = userService.create(userCreateRequest, profileRequest);
+    UserDto createdUser = userService.create(userCreateRequest, profileRequest);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
   }
@@ -137,7 +138,7 @@ public class UserController {
       path = "/{userId}"
       , consumes = MediaType.MULTIPART_FORM_DATA_VALUE
   )
-  public ResponseEntity<User> update(
+  public ResponseEntity<UserDto> update(
       @Parameter(
           name = "userId",
           description = "수정할 User ID",
@@ -150,7 +151,7 @@ public class UserController {
         Optional.ofNullable(profile)
             .flatMap(this::resolveProfileRequest);
 
-    User updatedUSer = userService.update(userId, userUpdateRequest, profileRequest);
+    UserDto updatedUSer = userService.update(userId, userUpdateRequest, profileRequest);
 
     return ResponseEntity.status(HttpStatus.OK).body(updatedUSer);
   }
@@ -197,13 +198,13 @@ public class UserController {
       )
   })
   @PatchMapping(path = "/{userId}/userStatus")
-  public ResponseEntity<UserStatus> userStatusUpdate(
+  public ResponseEntity<UserStatusDto> userStatusUpdate(
       @Parameter(name = "userId",
           description = "상태를 변경할 UserID",
           required = true) @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request
   ) {
-    UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
+    UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUserStatus);

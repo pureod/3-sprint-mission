@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -63,7 +64,7 @@ public class MessageController {
       )
   })
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Message> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -75,8 +76,8 @@ public class MessageController {
       }
     }
 
-    Message created = messageService.create(messageCreateRequest, attachmentRequests);
-    return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
   }
 
   @Operation(summary = "Message 내용 수정")
@@ -99,7 +100,7 @@ public class MessageController {
       )
   })
   @PatchMapping("/{messageId}")
-  public ResponseEntity<Message> update(
+  public ResponseEntity<MessageDto> update(
       @Parameter(
           name = "messageId",
           description = "수정할 Message ID",
@@ -107,8 +108,8 @@ public class MessageController {
       @RequestBody MessageUpdateRequest request
   ) {
 
-    Message updatedmessage = messageService.update(messageId, request);
-    return ResponseEntity.status(HttpStatus.OK).body(updatedmessage);
+    MessageDto updatedMessage = messageService.update(messageId, request);
+    return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
 
   }
 
@@ -153,13 +154,13 @@ public class MessageController {
       )
   })
   @GetMapping
-  public ResponseEntity<List<Message>> findAllByChannelId
+  public ResponseEntity<List<MessageDto>> findAllByChannelId
       (@Parameter(
           name = "channelId",
           description = "조회할 Channel ID",
           required = true) @RequestParam("channelId") UUID channelId
       ) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
+    List<MessageDto> messages = messageService.findAllByChannelId(channelId);
 
     return ResponseEntity.status(HttpStatus.OK).body(messages);
   }

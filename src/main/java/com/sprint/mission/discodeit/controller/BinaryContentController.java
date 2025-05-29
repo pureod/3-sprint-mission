@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,12 +51,12 @@ public class BinaryContentController {
       )
   })
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContent> find(
+  public ResponseEntity<BinaryContentDto> find(
       @Parameter(name = "binaryContentId",
           description = "조회할 첨부 파일 ID",
           required = true) @PathVariable("binaryContentId") UUID binaryContentId
   ) {
-    BinaryContent content = binaryContentService.find(binaryContentId);
+    BinaryContentDto content = binaryContentService.find(binaryContentId);
 
     return ResponseEntity.status(HttpStatus.OK).body(content);
   }
@@ -72,14 +73,34 @@ public class BinaryContentController {
       )
   })
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> findAll(
+  public ResponseEntity<List<BinaryContentDto>> findAll(
       @Parameter(name = "binaryContentIds",
           description = "조회할 첨부 파일 ID 목록",
           required = true) @RequestParam("binaryContentIds") List<UUID> binaryContentIds
   ) {
-    List<BinaryContent> contents = binaryContentService.findAllByIdIn(binaryContentIds);
+    List<BinaryContentDto> contents = binaryContentService.findAllByIdIn(binaryContentIds);
 
     return ResponseEntity.status(HttpStatus.OK).body(contents);
+  }
+
+  @Operation(summary = "파일 다운로드")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "파일 다운로드 성공",
+          content = @Content(
+              mediaType = "*/*",
+              schema = @Schema(type = "string", format = "binary")
+          )
+      )
+  })
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<byte[]> download(
+      @Parameter(name = "binaryContentId",
+          description = "다운로드할 파일 ID",
+          required = true) @PathVariable("binaryContentId") UUID binaryContentId
+  ) {
+    return ResponseEntity.ok().build();
   }
 
 }

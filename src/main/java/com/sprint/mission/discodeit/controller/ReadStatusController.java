@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -65,10 +66,10 @@ public class ReadStatusController {
       )
   })
   @PostMapping
-  public ResponseEntity<ReadStatus> create(
+  public ResponseEntity<ReadStatusDto> create(
       @RequestBody ReadStatusCreateRequest request
   ) {
-    ReadStatus createdStatus = readStatusService.create(request);
+    ReadStatusDto createdStatus = readStatusService.create(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdStatus);
   }
@@ -95,7 +96,7 @@ public class ReadStatusController {
       )
   })
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> update(
+  public ResponseEntity<ReadStatusDto> update(
       @Parameter(
           name = "readStatusId",
           description = "수정할 읽음 상태 ID",
@@ -103,7 +104,7 @@ public class ReadStatusController {
       @RequestBody ReadStatusUpdateRequest request
   ) {
 
-    ReadStatus updatedStatus = readStatusService.update(readStatusId, request);
+    ReadStatusDto updatedStatus = readStatusService.update(readStatusId, request);
 
     return ResponseEntity.status(HttpStatus.OK).body(updatedStatus);
   }
@@ -120,14 +121,14 @@ public class ReadStatusController {
       )
   )
   @GetMapping
-  public ResponseEntity<List<ReadStatus>> findAllByUserId(
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
       @Parameter(
           name = "userId",
           description = "조회할 User ID",
           required = true) @RequestParam("userId") UUID userId
   ) {
 
-    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
 
     return ResponseEntity.status(HttpStatus.OK).body(readStatuses);
   }

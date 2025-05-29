@@ -48,10 +48,10 @@ public class ChannelController {
       )
   )
   @PostMapping("/public")
-  public ResponseEntity<Channel> createPublic(
+  public ResponseEntity<ChannelDto> createPublic(
       @RequestBody PublicChannelCreateRequest request
   ) {
-    Channel createdChannel = channelService.create(request);
+    ChannelDto createdChannel = channelService.create(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
   }
@@ -67,10 +67,10 @@ public class ChannelController {
       )
   )
   @PostMapping("/private")
-  public ResponseEntity<Channel> createPrivate(
+  public ResponseEntity<ChannelDto> createPrivate(
       @RequestBody PrivateChannelCreateRequest request
   ) {
-    Channel createdChannel = channelService.create(request);
+    ChannelDto createdChannel = channelService.create(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
   }
@@ -103,14 +103,14 @@ public class ChannelController {
       )
   })
   @PatchMapping("/{channelId}")
-  public ResponseEntity<Channel> update(
+  public ResponseEntity<ChannelDto> update(
       @Parameter(
           name = "channelId",
           description = "수정할 Channel ID",
           required = true) @PathVariable("channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest request
   ) {
-    Channel updatedChannel = channelService.update(channelId, request);
+    ChannelDto updatedChannel = channelService.update(channelId, request);
 
     return ResponseEntity.status(HttpStatus.OK).body(updatedChannel);
   }
