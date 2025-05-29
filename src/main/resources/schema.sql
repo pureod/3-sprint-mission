@@ -76,8 +76,8 @@ CREATE TABLE read_statuses
     id           uuid PRIMARY KEY,
     created_at   timestamptz NOT NULL,
     updated_at   timestamptz,
-    user_id      uuid        NOT NULL,
-    channel_id   uuid        NOT NULL,
+    user_id      uuid,
+    channel_id   uuid,
     last_read_at timestamptz NOT NULL,
     CONSTRAINT uk_read_status UNIQUE (user_id, channel_id),
     CONSTRAINT fk_read_user FOREIGN KEY (user_id)
