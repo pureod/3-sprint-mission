@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -33,10 +35,10 @@ public class BasicBinaryContentService implements BinaryContentService {
         .fileName(fileName)
         .size((long) bytes.length)
         .contentType(contentType)
-        .bytes(bytes)
         .build();
 
     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+    binaryContentStorage.put(savedBinaryContent.getId(), bytes);
 
     return binaryContentMapper.toDto(savedBinaryContent);
   }

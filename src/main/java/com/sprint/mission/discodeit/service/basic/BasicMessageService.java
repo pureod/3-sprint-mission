@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final MessageMapper messageMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -58,10 +60,10 @@ public class BasicMessageService implements MessageService {
           .fileName(attachmentRequest.fileName())
           .size((long) attachmentRequest.bytes().length)
           .contentType(attachmentRequest.contentType())
-          .bytes(attachmentRequest.bytes())
           .build();
 
       BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+      binaryContentStorage.put(savedBinaryContent.getId(), attachmentRequest.bytes());
       attachments.add(savedBinaryContent);
     }
 

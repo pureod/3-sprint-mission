@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,6 +30,7 @@ public class BasicUserService implements UserService {
   //
   private final BinaryContentRepository binaryContentRepository;
   private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -53,8 +55,9 @@ public class BasicUserService implements UserService {
           .fileName(profileCreateRequest.fileName())
           .size((long) profileCreateRequest.bytes().length)
           .contentType(profileCreateRequest.contentType())
-          .bytes(profileCreateRequest.bytes())
           .build();
+
+      binaryContentStorage.put(profile.getId(), profileCreateRequest.bytes());
     }
 
     UserStatus userStatus = UserStatus.builder()
@@ -125,10 +128,10 @@ public class BasicUserService implements UserService {
           .fileName(profileUpdateRequest.fileName())
           .size((long) profileUpdateRequest.bytes().length)
           .contentType(profileUpdateRequest.contentType())
-          .bytes(profileUpdateRequest.bytes())
           .build();
 
       binaryContentRepository.save(newProfile);
+      binaryContentStorage.put(newProfile.getId(), profileUpdateRequest.bytes());
     }
 
     UserStatus userStatus = user.getStatus();
