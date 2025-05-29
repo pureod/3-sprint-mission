@@ -27,5 +27,8 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
   @Query("SELECT rs.user.id FROM ReadStatus rs WHERE rs.channel.id = :channelId")
   List<UUID> findUserIdsByChannelId(@Param("channelId") UUID channelId);
 
+  @Query("SELECT rs.user FROM ReadStatus rs WHERE rs.channel.id = :channelId")
+  List<User> findUsersByChannelId(@Param("channelId") UUID channelId);
+
 
 }
