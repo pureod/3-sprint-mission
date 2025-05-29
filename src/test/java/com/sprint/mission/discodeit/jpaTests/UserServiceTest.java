@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.jpaTests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -27,12 +28,12 @@ public class UserServiceTest {
     UserCreateRequest request = new UserCreateRequest("홍길동", "hong@example.com", "1234");
 
     // when
-    User response = userService.create(request, Optional.empty());
+    UserDto response = userService.create(request, Optional.empty());
 
     // then
-    assertNotNull(response.getId());
-    assertEquals("홍길동", response.getUsername());
-    assertEquals("hong@example.com", response.getEmail());
+    assertNotNull(response.id());
+    assertEquals("홍길동", response.username());
+    assertEquals("hong@example.com", response.email());
 
   }
 
