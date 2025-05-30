@@ -130,9 +130,6 @@ public class BasicUserService implements UserService {
           .contentType(profileUpdateRequest.contentType())
           .build();
 
-//      binaryContentRepository.save(newProfile);
-//      binaryContentStorage.put(newProfile.getId(), profileUpdateRequest.bytes());
-
       BinaryContent savedProfile = binaryContentRepository.save(newProfile);
       binaryContentStorage.put(savedProfile.getId(), profileUpdateRequest.bytes());
       newProfile = savedProfile;
