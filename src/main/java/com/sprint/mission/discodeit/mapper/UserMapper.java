@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import java.lang.runtime.ObjectMethods;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +20,13 @@ public class UserMapper {
     // db 구조 상 null 값을 불허하지만 추후 확장성을 고려하여 추가
     Boolean online = user.getStatus() != null ? user.getStatus().isOnline() : null;
 
-    return new UserDto(
-        user.getId(),
-        user.getUsername(),
-        user.getEmail(),
-        binaryContentMapper.toDto(user.getProfile()),
-        online
-    );
+    return UserDto.builder()
+        .id(user.getId())
+        .username(user.getUsername())
+        .email(user.getEmail())
+        .profile(binaryContentMapper.toDto(user.getProfile()))
+        .online(online)
+        .build();
+
   }
 }

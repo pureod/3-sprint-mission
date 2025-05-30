@@ -7,13 +7,12 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -28,27 +27,27 @@ public class ChannelMapper {
       return null;
     }
 
-    Instant lastMessageAt = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(
+    Instant lastMessageAt_DTO = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(
             channel.getId())
         .map(BaseEntity::getCreatedAt)
         .orElse(Instant.MIN);
 
-    List<UserDto> participants = new ArrayList<>();
+    List<UserDto> participants_DTO = new ArrayList<>();
 
     if (channel.getType().equals(ChannelType.PRIVATE)) {
-      participants = readStatusRepository.findUsersByChannelId(channel.getId())
+      participants_DTO = readStatusRepository.findUsersByChannelId(channel.getId())
           .stream()
           .map(userMapper::toDto)
           .collect(Collectors.toList());
     }
 
-    return new ChannelDto(
-        channel.getId(),
-        channel.getType(),
-        channel.getName(),
-        channel.getDescription(),
-        participants,
-        lastMessageAt
-    );
+    return ChannelDto.builder()
+        .id(channel.getId())
+        .type(channel.getType())
+        .name(channel.getName())
+        .description(channel.getDescription())
+        .participants(participants_DTO)
+        .lastMessageAt(lastMessageAt_DTO)
+        .build();
   }
 }

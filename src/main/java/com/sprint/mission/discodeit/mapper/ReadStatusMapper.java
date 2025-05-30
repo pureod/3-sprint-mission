@@ -12,11 +12,12 @@ public class ReadStatusMapper {
       return null;
     }
 
-    return new ReadStatusDto(
-        readStatus.getId(),
-        readStatus.getUser().getId(),
-        readStatus.getChannel().getId(),
-        readStatus.getLastReadAt()
-    );
+    return ReadStatusDto.builder()
+        .id(readStatus.getId())
+        .userId(readStatus.getUser().getId())
+        .channelId(readStatus.getChannel().getId())
+        .lastReadAt(readStatus.getLastReadAt())
+        .build();
+
   }
 }

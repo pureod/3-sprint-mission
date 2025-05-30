@@ -18,17 +18,18 @@ public class MessageMapper {
       return null;
     }
 
-    return new MessageDto(
-        message.getId(),
-        message.getCreatedAt(),
-        message.getUpdatedAt(),
-        message.getContent(),
-        message.getChannel().getId(),
-        userMapper.toDto(message.getAuthor()),
-        message.getAttachments().stream()
+    return MessageDto.builder()
+        .id(message.getId())
+        .createdAt(message.getCreatedAt())
+        .updatedAt(message.getUpdatedAt())
+        .content(message.getContent())
+        .channelId(message.getChannel().getId())
+        .author(userMapper.toDto(message.getAuthor()))
+        .attachments(message.getAttachments().stream()
             .map(binaryContentMapper::toDto)
-            .collect(Collectors.toList())
-    );
+            .collect(Collectors.toList()))
+        .build();
+
   }
 
 }

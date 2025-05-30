@@ -11,12 +11,13 @@ public class UserStatusMapper {
     if (userStatus == null) {
       return null;
     }
-    
-    return new UserStatusDto(
-        userStatus.getId(),
-        userStatus.getUser().getId(),
-        userStatus.getLastActiveAt()
-    );
+
+    return UserStatusDto.builder()
+        .id(userStatus.getId())
+        .userId(userStatus.getUser().getId())
+        .lastActiveAt(userStatus.getLastActiveAt())
+        .build();
+
   }
 
 }
