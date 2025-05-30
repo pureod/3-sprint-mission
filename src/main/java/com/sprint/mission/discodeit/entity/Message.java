@@ -61,7 +61,6 @@ public class Message extends BaseUpdatableEntity {
     if (newContent != null && !newContent.equals(this.content)) {
       this.content = newContent;
     }
-    // attachments를 수정하는 메소드도 고려
   }
 
 }

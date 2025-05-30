@@ -34,10 +34,6 @@ public class User extends BaseUpdatableEntity {
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus status;
 
-//  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//  private List<ReadStatus> readStatuses = new ArrayList<>();
-
-
   public User(String username, String email, String password, BinaryContent profile,
       UserStatus status) {
     super();
