@@ -19,9 +19,11 @@ spring:
         use_sql_comments: true
 
 discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit
+  storage:
+    type: local  # 또는 fake
+    local:
+      root-path: ./.storage
+
 
 logging:
   level:
