@@ -16,8 +16,11 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -92,12 +95,16 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
+  public Page<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+    pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
+        pageable.getPageSize(),
+        Sort.by("createdAt").descending()
+    );
 
-    return messageRepository.findAllByChannelId(channelId)
-        .stream()
-        .map(messageMapper::toDto)
-        .collect(Collectors.toList());
+    Page<Message> messagePage = messageRepository.findAllByChannelId(channelId,
+        pageable);
+
+    return messagePage.map(messageMapper::toDto);
   }
 
   @Override
