@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +60,7 @@ public class MessageController {
           description = "Message가 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageDto.class)
           )
       ),
       @ApiResponse(
@@ -95,7 +96,7 @@ public class MessageController {
           description = "Message가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageDto.class)
           )
       ),
       @ApiResponse(
@@ -157,7 +158,7 @@ public class MessageController {
           description = "Message 목록 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              array = @ArraySchema(schema = @Schema(implementation = Message.class))
+              array = @ArraySchema(schema = @Schema(implementation = MessageDto.class))
           )
       )
   })
@@ -168,12 +169,17 @@ public class MessageController {
               description = "조회할 Channel ID",
               required = true) @RequestParam("channelId") UUID channelId,
           @Parameter(
+              name = "cursor",
+              description = "페이징 커서 정보",
+              required = false) @RequestParam(value = "cursor", required = false) LocalDateTime cursor,
+          @Parameter(
               name = "pageable",
               description = "페이징 정보",
               required = true)
           @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
       ) {
-    Page<MessageDto> messages = messageService.findAllByChannelId(channelId, pageable);
+    Page<MessageDto> messages = messageService.findAllByChannelIdWithCursor(channelId, cursor,
+        pageable);
     PageResponse<MessageDto> response = pageResponseMapper.fromPage(messages);
 
     return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -38,7 +38,7 @@ public class AuthController {
           description = "로그인 성공",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = User.class)
+              schema = @Schema(implementation = UserDto.class)
           )
       ),
       @ApiResponse(

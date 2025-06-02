@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -24,4 +25,8 @@ public interface MessageService {
   MessageDto update(UUID messageId, MessageUpdateRequest request);
 
   void delete(UUID messageId);
+
+  Page<MessageDto> findAllByChannelIdWithCursor(UUID channelId, LocalDateTime cursor,
+      Pageable pageable);
+
 }

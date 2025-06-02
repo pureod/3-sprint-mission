@@ -45,7 +45,7 @@ public class ReadStatusController {
           description = "Message 읽음 상태가 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = ReadStatus.class)
+              schema = @Schema(implementation = ReadStatusDto.class)
           )
       ),
       @ApiResponse(
@@ -83,7 +83,7 @@ public class ReadStatusController {
           description = "Message 읽음 상태가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = ReadStatus.class)
+              schema = @Schema(implementation = ReadStatusDto.class)
           )
       ),
       @ApiResponse(
@@ -117,7 +117,7 @@ public class ReadStatusController {
       description = "Message 읽음 상태 목록 조회 성공",
       content = @Content(
           mediaType = "*/*",
-          array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))
+          array = @ArraySchema(schema = @Schema(implementation = ReadStatusDto.class))
       )
   )
   @GetMapping

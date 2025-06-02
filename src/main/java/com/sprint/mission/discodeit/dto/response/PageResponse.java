@@ -12,7 +12,7 @@ public class PageResponse<T> {
 
   List<T> content;
 
-  int number;
+  Object nextCursor;
 
   int size;
 

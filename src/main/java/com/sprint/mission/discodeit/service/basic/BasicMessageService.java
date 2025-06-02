@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -130,5 +131,26 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.delete(message);
   }
+
+  // MessageService에 추가할 메소드 예시
+  @Override
+  @Transactional(readOnly = true)
+  public Page<MessageDto> findAllByChannelIdWithCursor(UUID channelId, LocalDateTime cursor,
+      Pageable pageable) {
+
+    Page<Message> messagePage;
+
+    if (cursor != null) {
+      // 커서 이후의 데이터만 조회
+      messagePage = messageRepository.findByChannelIdAndCreatedAtBeforeOrderByCreatedAtDesc(
+          channelId, cursor, pageable);
+    } else {
+      // 첫 페이지 조회
+      messagePage = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+    }
+
+    return messagePage.map(messageMapper::toDto);
+  }
+
 
 }

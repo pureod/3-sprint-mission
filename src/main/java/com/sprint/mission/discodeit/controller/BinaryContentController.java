@@ -40,7 +40,7 @@ public class BinaryContentController {
           description = "첨부 파일 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = BinaryContent.class)
+              schema = @Schema(implementation = BinaryContentDto.class)
           )
       ),
       @ApiResponse(
@@ -70,7 +70,7 @@ public class BinaryContentController {
           description = "첨부 파일 목록 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))
+              array = @ArraySchema(schema = @Schema(implementation = BinaryContentDto.class))
           )
       )
   })

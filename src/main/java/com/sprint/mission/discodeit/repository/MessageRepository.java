@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,5 +29,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   void deleteAllByChannelId(UUID channelId);
 
   Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId);
+
+  Page<Message> findByChannelIdAndCreatedAtBeforeOrderByCreatedAtDesc(
+      UUID channelId, LocalDateTime cursor, Pageable pageable);
+
+  Page<Message> findByChannelIdOrderByCreatedAtDesc(
+      UUID channelId, Pageable pageable);
+
 
 }
