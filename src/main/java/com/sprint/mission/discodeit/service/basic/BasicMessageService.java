@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -15,12 +16,15 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -96,16 +100,20 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-    pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
-        pageable.getPageSize(),
-        Sort.by("createdAt").descending()
-    );
+  public Slice<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
+      Pageable pageable) {
 
-    Page<Message> messagePage = messageRepository.findAllWithAuthorAndChannelByChannelId(channelId,
-        pageable);
+    int pageSize = (pageable != null && pageable.isPaged()) ? pageable.getPageSize() : 50;
 
-    return messagePage.map(messageMapper::toDto);
+    PageRequest pageRequest = PageRequest.of(0, pageSize + 1,
+        Sort.by(Sort.Direction.DESC, "createdAt"));
+
+    Slice<Message> messageSlice = (cursor != null)
+        ? messageRepository.findAllByChannel_IdAndCreatedAtBefore(channelId, cursor,
+        pageRequest)
+        : messageRepository.findAllByChannel_Id(channelId, pageRequest);
+
+    return messageSlice.map(messageMapper::toDto);
   }
 
   @Override
@@ -131,26 +139,5 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.delete(message);
   }
-
-  // MessageService에 추가할 메소드 예시
-  @Override
-  @Transactional(readOnly = true)
-  public Page<MessageDto> findAllByChannelIdWithCursor(UUID channelId, LocalDateTime cursor,
-      Pageable pageable) {
-
-    Page<Message> messagePage;
-
-    if (cursor != null) {
-      // 커서 이후의 데이터만 조회
-      messagePage = messageRepository.findByChannelIdAndCreatedAtBeforeOrderByCreatedAtDesc(
-          channelId, cursor, pageable);
-    } else {
-      // 첫 페이지 조회
-      messagePage = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
-    }
-
-    return messagePage.map(messageMapper::toDto);
-  }
-
 
 }

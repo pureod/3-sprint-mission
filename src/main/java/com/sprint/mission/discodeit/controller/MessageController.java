@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -171,16 +173,16 @@ public class MessageController {
           @Parameter(
               name = "cursor",
               description = "페이징 커서 정보",
-              required = false) @RequestParam(value = "cursor", required = false) LocalDateTime cursor,
+              required = false) @RequestParam(value = "cursor", required = false) Instant cursor,
           @Parameter(
               name = "pageable",
               description = "페이징 정보",
               required = true)
           @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
       ) {
-    Page<MessageDto> messages = messageService.findAllByChannelIdWithCursor(channelId, cursor,
+    Slice<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
-    PageResponse<MessageDto> response = pageResponseMapper.fromPage(messages);
+    PageResponse<MessageDto> response = pageResponseMapper.fromSlice(messages);
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
