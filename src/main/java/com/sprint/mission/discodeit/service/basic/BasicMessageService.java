@@ -101,7 +101,7 @@ public class BasicMessageService implements MessageService {
         Sort.by("createdAt").descending()
     );
 
-    Page<Message> messagePage = messageRepository.findAllByChannelId(channelId,
+    Page<Message> messagePage = messageRepository.findAllWithAuthorAndChannelByChannelId(channelId,
         pageable);
 
     return messagePage.map(messageMapper::toDto);

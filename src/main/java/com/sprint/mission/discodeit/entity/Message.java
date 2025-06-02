@@ -33,11 +33,11 @@ public class Message extends BaseUpdatableEntity {
   @Column(name = "content")
   private String content;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "channel_id", nullable = false)
   private Channel channel;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "author_id", nullable = false)
   private User author;
 

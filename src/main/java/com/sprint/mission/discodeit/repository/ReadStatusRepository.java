@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
+  @EntityGraph(attributePaths = {"user", "channel"})
   List<ReadStatus> findAllByUserId(UUID userId);
 
   List<ReadStatus> findAllByChannelId(UUID channelId);
@@ -29,6 +31,5 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
   @Query("SELECT rs.user FROM ReadStatus rs WHERE rs.channel.id = :channelId")
   List<User> findUsersByChannelId(@Param("channelId") UUID channelId);
-
-
+  
 }

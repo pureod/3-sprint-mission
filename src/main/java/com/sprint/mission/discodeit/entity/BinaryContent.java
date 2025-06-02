@@ -17,9 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "binary_contents")
-public class BinaryContent extends BaseEntity implements Serializable {
-
-  private static final long serialVersionUID = 1L;
+public class BinaryContent extends BaseEntity {
 
   @Column(name = "file_name", nullable = false)
   private String fileName;
