@@ -43,6 +43,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public BinaryContentDto find(UUID binaryContentId) {
 
     BinaryContent binaryContent = binaryContentRepository.findById((binaryContentId))
@@ -54,6 +55,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
     return binaryContentRepository.findAllByIdIn(binaryContentIds)
         .stream()
