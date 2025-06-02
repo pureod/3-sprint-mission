@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -44,6 +45,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final MessageMapper messageMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final PageResponseMapper pageResponseMapper;
 
   @Override
   @Transactional
@@ -100,7 +102,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public Slice<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
       Pageable pageable) {
 
     int pageSize = (pageable != null && pageable.isPaged()) ? pageable.getPageSize() : 50;
@@ -113,7 +115,7 @@ public class BasicMessageService implements MessageService {
         pageRequest)
         : messageRepository.findAllByChannel_Id(channelId, pageRequest);
 
-    return messageSlice.map(messageMapper::toDto);
+    return pageResponseMapper.fromSlice(messageSlice.map(messageMapper::toDto));
   }
 
   @Override

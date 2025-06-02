@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
@@ -50,30 +51,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
-public class MessageController {
+public class MessageController implements MessageApi {
 
   private final MessageService messageService;
   private final PageResponseMapper pageResponseMapper;
 
-  @Operation(summary = "Message 생성")
-  @ApiResponses({
-      @ApiResponse(
-          responseCode = "201",
-          description = "Message가 성공적으로 생성됨",
-          content = @Content(
-              mediaType = "*/*",
-              schema = @Schema(implementation = MessageDto.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Channel 또는 User를 찾을 수 없음",
-          content = @Content(
-              mediaType = "*/*",
-              examples = @ExampleObject(value = "Channel | Author with id {channelId | authorId} not found")
-          )
-      )
-  })
+  @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
@@ -91,31 +74,10 @@ public class MessageController {
     return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
   }
 
-  @Operation(summary = "Message 내용 수정")
-  @ApiResponses({
-      @ApiResponse(
-          responseCode = "200",
-          description = "Message가 성공적으로 수정됨",
-          content = @Content(
-              mediaType = "*/*",
-              schema = @Schema(implementation = MessageDto.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Message를 찾을 수 없음",
-          content = @Content(
-              mediaType = "*/*",
-              examples = @ExampleObject(value = "Message with id {messageId} not found")
-          )
-      )
-  })
+  @Override
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> update(
-      @Parameter(
-          name = "messageId",
-          description = "수정할 Message ID",
-          required = true) @PathVariable("messageId") UUID messageId,
+      @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request
   ) {
 
@@ -124,67 +86,28 @@ public class MessageController {
 
   }
 
-  @Operation(summary = "Message 삭제")
-  @ApiResponses({
-      @ApiResponse(
-          responseCode = "204",
-          description = "Message가 성공적으로 삭제됨"
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Message를 찾을 수 없음",
-          content = @Content(
-              mediaType = "*/*",
-              examples = @ExampleObject(value = "Message with id {messageId} not found")
-          )
-      )
-  })
+  @Override
   @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> delete(
-      @Parameter(
-          name = "messageId",
-          description = "삭제할 Message ID",
-          required = true) @PathVariable("messageId") UUID messageId
+      @PathVariable("messageId") UUID messageId
   ) {
 
     messageService.delete(messageId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @Operation(
-      summary = "Channel의 Message 목록 조회"
-  )
-  @ApiResponses({
-      @ApiResponse(
-          responseCode = "200",
-          description = "Message 목록 조회 성공",
-          content = @Content(
-              mediaType = "*/*",
-              array = @ArraySchema(schema = @Schema(implementation = MessageDto.class))
-          )
-      )
-  })
+  @Override
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId
-      (@Parameter(
-              name = "channelId",
-              description = "조회할 Channel ID",
-              required = true) @RequestParam("channelId") UUID channelId,
-          @Parameter(
-              name = "cursor",
-              description = "페이징 커서 정보",
-              required = false) @RequestParam(value = "cursor", required = false) Instant cursor,
-          @Parameter(
-              name = "pageable",
-              description = "페이징 정보",
-              required = true)
+      (
+          @RequestParam("channelId") UUID channelId,
+          @RequestParam(value = "cursor", required = false) Instant cursor,
           @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC) Pageable pageable
       ) {
-    Slice<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
-        pageable);
-    PageResponse<MessageDto> response = pageResponseMapper.fromSlice(messages);
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId,
+        cursor, pageable);
 
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body(messages);
   }
 
 

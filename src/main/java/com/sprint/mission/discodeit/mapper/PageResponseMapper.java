@@ -34,14 +34,11 @@ public class PageResponseMapper {
       return null;
     }
 
-    // 마지막 요소에서 커서 값 추출
     T lastElement = slice.getContent().get(slice.getContent().size() - 1);
 
-    // MessageDto의 경우 createdAt을 커서로 사용
     if (lastElement instanceof MessageDto) {
       return ((MessageDto) lastElement).createdAt();
     }
-
     return null;
   }
 
