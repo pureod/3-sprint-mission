@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-03T09:31:51+0900",
+    date = "2025-06-03T10:26:56+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
@@ -20,6 +20,8 @@ public class MessageMapperImpl implements MessageMapper {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private BinaryContentMapper binaryContentMapper;
 
     @Override
     public MessageDto toDto(Message message) {
@@ -41,21 +43,6 @@ public class MessageMapperImpl implements MessageMapper {
         return messageDto.build();
     }
 
-    protected BinaryContentDto binaryContentToBinaryContentDto(BinaryContent binaryContent) {
-        if ( binaryContent == null ) {
-            return null;
-        }
-
-        BinaryContentDto.BinaryContentDtoBuilder binaryContentDto = BinaryContentDto.builder();
-
-        binaryContentDto.id( binaryContent.getId() );
-        binaryContentDto.fileName( binaryContent.getFileName() );
-        binaryContentDto.size( binaryContent.getSize() );
-        binaryContentDto.contentType( binaryContent.getContentType() );
-
-        return binaryContentDto.build();
-    }
-
     protected List<BinaryContentDto> binaryContentListToBinaryContentDtoList(List<BinaryContent> list) {
         if ( list == null ) {
             return null;
@@ -63,7 +50,7 @@ public class MessageMapperImpl implements MessageMapper {
 
         List<BinaryContentDto> list1 = new ArrayList<BinaryContentDto>( list.size() );
         for ( BinaryContent binaryContent : list ) {
-            list1.add( binaryContentToBinaryContentDto( binaryContent ) );
+            list1.add( binaryContentMapper.toDto( binaryContent ) );
         }
 
         return list1;
