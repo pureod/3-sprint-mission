@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +43,10 @@ public class UserStatus extends BaseUpdatableEntity {
   }
 
   public Boolean isOnline() {
+    if (lastActiveAt == null) {
+      return false;
+    }
+
     Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
     return lastActiveAt.isAfter(instantFiveMinutesAgo);
