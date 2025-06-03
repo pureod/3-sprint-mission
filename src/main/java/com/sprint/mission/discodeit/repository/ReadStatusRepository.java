@@ -19,8 +19,6 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
   @EntityGraph(attributePaths = {"user", "channel"})
   List<ReadStatus> findAllByUserId(UUID userId);
 
-  List<ReadStatus> findAllByChannelId(UUID channelId);
-
   void deleteAllByChannelId(UUID channelId);
 
   @Query("SELECT rs.channel.id FROM ReadStatus rs WHERE rs.user.id = :userId")
@@ -31,5 +29,5 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
   @Query("SELECT rs.user FROM ReadStatus rs WHERE rs.channel.id = :channelId")
   List<User> findUsersByChannelId(@Param("channelId") UUID channelId);
-  
+
 }

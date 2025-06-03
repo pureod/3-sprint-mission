@@ -56,8 +56,6 @@ public class BasicUserService implements UserService {
           .size((long) profileCreateRequest.bytes().length)
           .contentType(profileCreateRequest.contentType())
           .build();
-
-      binaryContentStorage.put(profile.getId(), profileCreateRequest.bytes());
     }
 
     UserStatus userStatus = UserStatus.builder()
@@ -75,6 +73,11 @@ public class BasicUserService implements UserService {
     userStatus.setUser(user);
 
     User savedUser = userRepository.save(user);
+
+    if (optionalProfileCreateRequest.isPresent()) {
+      binaryContentStorage.put(savedUser.getProfile().getId(),
+          optionalProfileCreateRequest.get().bytes());
+    }
 
     return userMapper.toDto(savedUser);
   }
