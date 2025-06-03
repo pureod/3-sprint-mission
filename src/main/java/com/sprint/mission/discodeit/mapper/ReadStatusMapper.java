@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ReadStatusMapper {
 
-  @Mapping(target = "userId", expression = "java(readStatus.getUser().getId())")
-  @Mapping(target = "channelId", expression = "java(readStatus.getChannel().getId())")
+  @Mapping(target = "userId", expression = "java(readStatus.getUser() != null ? readStatus.getUser().getId() : null)")
+  @Mapping(target = "channelId", expression = "java(readStatus.getChannel() != null ? readStatus.getChannel().getId() : null)")
   ReadStatusDto toDto(ReadStatus readStatus);
 }
