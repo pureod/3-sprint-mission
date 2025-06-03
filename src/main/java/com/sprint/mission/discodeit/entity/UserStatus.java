@@ -24,10 +24,10 @@ import lombok.Setter;
 public class UserStatus extends BaseUpdatableEntity {
 
   @OneToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "user_id", unique = true, nullable = false)
   private User user;
 
-  @Column(name = "last_active_at")
+  @Column(name = "last_active_at", nullable = false)
   private Instant lastActiveAt;
 
   public UserStatus(User user, Instant lastActiveAt) {
