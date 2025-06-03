@@ -37,7 +37,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         .build();
 
     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-    binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+    try {
+      binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to store binary content", e);
+    }
 
     return binaryContentMapper.toDto(savedBinaryContent);
   }
