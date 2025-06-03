@@ -94,15 +94,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(UUID userId) {
-    List<UUID> mySubscribedChannelIds = readStatusRepository.findChannelIdsByUserId(userId);
-
-    List<Channel> publicChannels = channelRepository.findByType(ChannelType.PUBLIC);
-    List<Channel> subscribedChannels = channelRepository.findAllById(mySubscribedChannelIds);
-
-    Set<Channel> channels = new HashSet<>();
-    channels.addAll(publicChannels);
-    channels.addAll(subscribedChannels);
-
+    List<Channel> channels = channelRepository.findAllByUserIdOrPublic(userId);
     return channels.stream()
         .map(channelMapper::toDto)
         .collect(Collectors.toList());
