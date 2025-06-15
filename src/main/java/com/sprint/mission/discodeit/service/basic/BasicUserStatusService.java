@@ -9,14 +9,13 @@ import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -27,50 +26,41 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepository userRepository;
   private final UserStatusMapper userStatusMapper;
 
-  @Override
   @Transactional
+  @Override
   public UserStatusDto create(UserStatusCreateRequest request) {
     UUID userId = request.userId();
-    Instant lastActiveAt = request.lastActiveAt();
 
     User user = userRepository.findById(userId)
-        .orElseThrow(
-            () -> new NoSuchElementException("User with id " + userId + " does not exist"));
+        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    Optional.ofNullable(user.getStatus())
+        .ifPresent(status -> {
+          throw new IllegalArgumentException("UserStatus with id " + userId + " already exists");
+        });
 
-    if (userStatusRepository.findByUser(user).isPresent()) {
-      throw new IllegalArgumentException("UserStatus with id " + userId + " already exists");
-    }
-
-    UserStatus userStatus = UserStatus.builder()
-        .user(user)
-        .lastActiveAt(lastActiveAt)
-        .build();
-
-    UserStatus savedUserStatus = userStatusRepository.save(userStatus);
-
-    return userStatusMapper.toDto(savedUserStatus);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public UserStatusDto find(UUID userStatusId) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
-        .orElseThrow(
-            () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
-
+    Instant lastActiveAt = request.lastActiveAt();
+    UserStatus userStatus = new UserStatus(user, lastActiveAt);
+    userStatusRepository.save(userStatus);
     return userStatusMapper.toDto(userStatus);
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public List<UserStatusDto> findAll() {
-    return userStatusRepository.findAll().stream()
+  public UserStatusDto find(UUID userStatusId) {
+    return userStatusRepository.findById(userStatusId)
         .map(userStatusMapper::toDto)
-        .collect(Collectors.toList());
+        .orElseThrow(
+            () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
   }
 
   @Override
+  public List<UserStatusDto> findAll() {
+    return userStatusRepository.findAll().stream()
+        .map(userStatusMapper::toDto)
+        .toList();
+  }
+
   @Transactional
+  @Override
   public UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
 
@@ -82,8 +72,8 @@ public class BasicUserStatusService implements UserStatusService {
     return userStatusMapper.toDto(userStatus);
   }
 
-  @Override
   @Transactional
+  @Override
   public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
 
@@ -95,13 +85,12 @@ public class BasicUserStatusService implements UserStatusService {
     return userStatusMapper.toDto(userStatus);
   }
 
-  @Override
   @Transactional
+  @Override
   public void delete(UUID userStatusId) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
-        .orElseThrow(
-            () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
-
-    userStatusRepository.delete(userStatus);
+    if (!userStatusRepository.existsById(userStatusId)) {
+      throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");
+    }
+    userStatusRepository.deleteById(userStatusId);
   }
 }
