@@ -28,10 +28,10 @@ public class BasicAuthService implements AuthService {
 
         User user = userRepository.findByUsername(username)
             .orElseThrow(
-                () -> new UserNotFoundException("User with username " + username + " not found"));
+                () -> new UserNotFoundException("User name or password is incorrect"));
 
         if (!user.getPassword().equals(password)) {
-            throw new InvalidPasswordException("Wrong password");
+            throw new InvalidPasswordException("User name or password is incorrect");
         }
 
         return userMapper.toDto(user);
