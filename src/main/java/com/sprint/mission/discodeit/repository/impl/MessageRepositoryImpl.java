@@ -44,21 +44,13 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
                     .and(message.createdAt.lt(createdAt))
             );
 
-        // 정렬 조건 적용
-        for (Sort.Order order : pageable.getSort()) {
-            OrderSpecifier<?> orderSpecifier = getOrderSpecifier(message, order);
-            if (orderSpecifier != null) {
-                query.orderBy(orderSpecifier);
-            }
-        }
+        query.orderBy(message.createdAt.desc());
 
-        // 페이징 적용 (hasNext 확인을 위해 limit + 1)
         List<Message> content = query
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
-        // hasNext 확인
         boolean hasNext = content.size() > pageable.getPageSize();
         if (hasNext) {
             content.remove(content.size() - 1);
@@ -82,14 +74,4 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
         return Optional.ofNullable(result);
     }
 
-    private OrderSpecifier<?> getOrderSpecifier(QMessage message, Sort.Order order) {
-        return switch (order.getProperty()) {
-            case "createdAt" ->
-                order.isAscending() ? message.createdAt.asc() : message.createdAt.desc();
-            case "updatedAt" ->
-                order.isAscending() ? message.updatedAt.asc() : message.updatedAt.desc();
-            case "content" -> order.isAscending() ? message.content.asc() : message.content.desc();
-            default -> null;
-        };
-    }
 }

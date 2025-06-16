@@ -96,11 +96,12 @@ public class BasicUserService implements UserService {
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
-        if (userRepository.existsByEmail(newEmail)) {
+        if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
             throw new EmailAlreadyExistsException(
                 "User with email " + newEmail + " already exists");
         }
-        if (userRepository.existsByUsername(newUsername)) {
+        if (!user.getUsername().equals(newUsername) && userRepository.existsByUsername(
+            newUsername)) {
             throw new UserNameAlreadyExistsException(
                 "User with username " + newUsername + " already exists");
         }
@@ -128,7 +129,7 @@ public class BasicUserService implements UserService {
     @Transactional
     @Override
     public void delete(UUID userId) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User with id " + userId + " not found");
         }
 

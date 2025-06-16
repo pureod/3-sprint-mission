@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.exception.base.DuplicatedException;
 import com.sprint.mission.discodeit.exception.base.NotFoundException;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
-import org.apache.tomcat.websocket.AuthenticationException;
+import com.sprint.mission.discodeit.exception.base.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

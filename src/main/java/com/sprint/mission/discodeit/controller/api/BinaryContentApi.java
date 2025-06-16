@@ -51,7 +51,7 @@ public interface BinaryContentApi {
             content = @Content(schema = @Schema(implementation = Resource.class))
         )
     })
-    ResponseEntity<?> download(
+    ResponseEntity<Resource> download(
         @Parameter(description = "다운로드할 파일 ID") UUID binaryContentId
     );
 } 

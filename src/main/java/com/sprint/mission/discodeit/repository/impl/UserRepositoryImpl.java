@@ -23,7 +23,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
         QBinaryContent profile = QBinaryContent.binaryContent;
 
         return queryFactory
-            .selectFrom(user)
+            .selectFrom(user).distinct()
             .leftJoin(user.profile, profile).fetchJoin()
             .join(user.status, status).fetchJoin()
             .fetch();
