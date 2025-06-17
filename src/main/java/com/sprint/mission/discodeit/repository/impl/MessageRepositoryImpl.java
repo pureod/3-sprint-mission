@@ -47,7 +47,6 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
         query.orderBy(message.createdAt.desc());
 
         List<Message> content = query
-            .offset(pageable.getOffset())
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
