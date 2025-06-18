@@ -17,10 +17,9 @@ public interface MessageService {
 
   MessageDto find(UUID messageId);
 
+  PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createdAt, Pageable pageable);
+
   MessageDto update(UUID messageId, MessageUpdateRequest request);
 
   void delete(UUID messageId);
-
-  PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
-
 }
