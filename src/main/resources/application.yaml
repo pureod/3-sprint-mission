@@ -3,7 +3,7 @@ spring:
     name: discodeit
 
   profiles:
-    active: dev  # 기본은 dev, 운영 시 prod로 교체
+    active: prod  # 기본은 dev, 운영 시 prod로 교체
 
   jpa:
     generate-ddl: false
@@ -24,9 +24,10 @@ discodeit:
 
 logging:
   level:
-    com.sprint.mission.discodeit: INFO
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    root: info
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: off  # debug가 default
+    org.hibernate.orm.jdbc.bind: off # trace가 default
 
 server:
   port: 8080

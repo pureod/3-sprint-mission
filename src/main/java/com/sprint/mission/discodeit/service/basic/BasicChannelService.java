@@ -19,9 +19,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
@@ -38,15 +40,23 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto create(PublicChannelCreateRequest request) {
         String name = request.name();
         String description = request.description();
+
+        log.info("공개 채널 생성 시작 - name: {}", name);
+
         Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
         channelRepository.save(channel);
+
+        log.info("공개 채널 생성 완료 - channelId: {}, name: {}", channel.getId(), name);
+
         return channelMapper.toDto(channel);
     }
 
     @Transactional
     @Override
     public ChannelDto create(PrivateChannelCreateRequest request) {
+        log.info("프라이빗 채널 생성 시작 - 참여자 수: {}", request.participantIds().size());
+
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         channelRepository.save(channel);
 
@@ -55,6 +65,9 @@ public class BasicChannelService implements ChannelService {
             .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
             .toList();
         readStatusRepository.saveAll(readStatuses);
+
+        log.info("프라이빗 채널 생성 완료 - channelId: {}, 참여자 수: {}",
+            channel.getId(), readStatuses.size());
 
         return channelMapper.toDto(channel);
     }
@@ -87,6 +100,9 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
         String newName = request.newName();
         String newDescription = request.newDescription();
+
+        log.info("채널 수정 시작 - channelId: {}, newName: {}", channelId, newName);
+
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(
                 () -> new ChannelNotFoundException("Channel with id " + channelId + " not found"));
@@ -94,12 +110,17 @@ public class BasicChannelService implements ChannelService {
             throw new ChannelOperationNotAllowedException("Private channel cannot be updated");
         }
         channel.update(newName, newDescription);
+
+        log.info("채널 수정 완료 - channelId: {}, name: {}", channelId, newName);
+
         return channelMapper.toDto(channel);
     }
 
     @Transactional
     @Override
     public void delete(UUID channelId) {
+        log.info("채널 삭제 시작 - channelId: {}", channelId);
+
         if (!channelRepository.existsById(channelId)) {
             throw new ChannelNotFoundException("Channel with id " + channelId + " not found");
         }
@@ -108,5 +129,8 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.deleteAllByChannelId(channelId);
 
         channelRepository.deleteById(channelId);
+
+        log.info("채널 삭제 완료 - channelId: {}", channelId);
+
     }
 }

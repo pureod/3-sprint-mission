@@ -26,11 +26,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -51,6 +53,9 @@ public class BasicMessageService implements MessageService {
         UUID channelId = messageCreateRequest.channelId();
         UUID authorId = messageCreateRequest.authorId();
 
+        log.info("메시지 생성 중 - channelId: {}, authorId: {}, 첨부파일 수: {}",
+            channelId, authorId, binaryContentCreateRequests.size());
+
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(
                 () -> new ChannelNotFoundException(
@@ -65,6 +70,9 @@ public class BasicMessageService implements MessageService {
                 String fileName = attachmentRequest.fileName();
                 String contentType = attachmentRequest.contentType();
                 byte[] bytes = attachmentRequest.bytes();
+
+                log.debug("메시지 첨부파일 저장 - 파일명: {}, 크기: {} bytes, 타입: {}",
+                    fileName, bytes.length, contentType);
 
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
@@ -83,6 +91,10 @@ public class BasicMessageService implements MessageService {
         );
 
         messageRepository.save(message);
+
+        log.info("메시지 생성 완료 - messageId: {}, channelId: {}, 첨부파일 수: {}",
+            message.getId(), channelId, attachments.size());
+
         return messageMapper.toDto(message);
     }
 
@@ -117,20 +129,30 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto update(UUID messageId, MessageUpdateRequest request) {
         String newContent = request.newContent();
+
+        log.info("메시지 수정 중 - messageId: {}", messageId);
+
         Message message = messageRepository.findById(messageId)
             .orElseThrow(
                 () -> new MessageNotFoundException("Message with id " + messageId + " not found"));
         message.update(newContent);
+
+        log.info("메시지 수정 완료 - messageId: {}", messageId);
+
         return messageMapper.toDto(message);
     }
 
     @Transactional
     @Override
     public void delete(UUID messageId) {
+        log.info("메시지 삭제 시작 - messageId: {}", messageId);
+
         if (!messageRepository.existsById(messageId)) {
             throw new MessageNotFoundException("Message with id " + messageId + " not found");
         }
 
         messageRepository.deleteById(messageId);
+
+        log.info("메시지 삭제 완료 - messageId: {}", messageId);
     }
 }

@@ -22,9 +22,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
@@ -42,8 +44,12 @@ public class BasicUserService implements UserService {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
+        log.info("사용자 생성 중 - username: {}, email: {}, 프로필 이미지: {}",
+            username, email, optionalProfileCreateRequest.isPresent() ? "있음" : "없음");
+
         if (userRepository.existsByEmail(email)) {
-            throw new EmailAlreadyExistsException("User with email " + email + " already exists");
+            throw new EmailAlreadyExistsException(
+                "User with email " + email + " already exists");
         }
         if (userRepository.existsByUsername(username)) {
             throw new UserNameAlreadyExistsException(
@@ -55,13 +61,22 @@ public class BasicUserService implements UserService {
                 String fileName = profileRequest.fileName();
                 String contentType = profileRequest.contentType();
                 byte[] bytes = profileRequest.bytes();
+
+                log.debug("프로필 이미지 저장 중 - 파일명: {}, 타입: {}, 크기: {} bytes",
+                    fileName, contentType, bytes.length);
+
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
                 binaryContentStorage.put(binaryContent.getId(), bytes);
+
+                log.debug("프로필 이미지 저장 완료 - 파일명: {}, 타입: {}, 크기: {} bytes",
+                    fileName, contentType, bytes.length);
+
                 return binaryContent;
             })
             .orElse(null);
+
         String password = userCreateRequest.password();
 
         User user = new User(username, email, password, nullableProfile);
@@ -69,6 +84,10 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(user, now);
 
         userRepository.save(user);
+
+        log.info("사용자 생성 완료 - userId: {}, username: {}, email: {}",
+            user.getId(), username, email);
+
         return userMapper.toDto(user);
     }
 
@@ -96,6 +115,11 @@ public class BasicUserService implements UserService {
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
+
+        log.info("사용자 수정 중 - userId: {}, newUsername: {}, newEmail: {}, 프로필 이미지: {}",
+            userId, newUsername, newEmail,
+            optionalProfileCreateRequest.isPresent() ? "변경" : "변경없음");
+
         if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
             throw new EmailAlreadyExistsException(
                 "User with email " + newEmail + " already exists");
@@ -112,6 +136,10 @@ public class BasicUserService implements UserService {
                 String fileName = profileRequest.fileName();
                 String contentType = profileRequest.contentType();
                 byte[] bytes = profileRequest.bytes();
+
+                log.debug("프로필 이미지 업데이트 - userId: {}, 파일명: {}, 크기: {} bytes",
+                    userId, fileName, bytes.length);
+
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
@@ -123,16 +151,23 @@ public class BasicUserService implements UserService {
         String newPassword = userUpdateRequest.newPassword();
         user.update(newUsername, newEmail, newPassword, nullableProfile);
 
+        log.info("사용자 수정 완료 - userId: {}, username: {}, email: {}",
+            userId, newUsername, newEmail);
+
         return userMapper.toDto(user);
     }
 
     @Transactional
     @Override
     public void delete(UUID userId) {
+        log.info("사용자 삭제 시작 - userId: {}", userId);
+
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User with id " + userId + " not found");
         }
 
         userRepository.deleteById(userId);
+
+        log.info("사용자 삭제 완료 - userId: {}", userId);
     }
 }

@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicReadStatusService implements ReadStatusService {
@@ -37,6 +39,8 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto create(ReadStatusCreateRequest request) {
         UUID userId = request.userId();
         UUID channelId = request.channelId();
+
+        log.info("읽음 상태 생성 중 - userId: {}, channelId: {}", userId, channelId);
 
         User user = userRepository.findById(userId)
             .orElseThrow(
@@ -56,6 +60,9 @@ public class BasicReadStatusService implements ReadStatusService {
         Instant lastReadAt = request.lastReadAt();
         ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
         readStatusRepository.save(readStatus);
+
+        log.info("읽음 상태 생성 완료 - readStatusId: {}, userId: {}, channelId: {}",
+            readStatus.getId(), userId, channelId);
 
         return readStatusMapper.toDto(readStatus);
     }
@@ -79,22 +86,32 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
+        log.info("읽음 상태 수정 중 - readStatusId: {}", readStatusId);
+
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(
                 () -> new ReadStatusNotFoundException(
                     "ReadStatus with id " + readStatusId + " not found"));
+
         readStatus.update(newLastReadAt);
+
+        log.info("읽음 상태 수정 완료 - readStatusId: {}", readStatusId);
+
         return readStatusMapper.toDto(readStatus);
     }
 
     @Transactional
     @Override
     public void delete(UUID readStatusId) {
+        log.info("읽음 상태 삭제 시작 - readStatusId: {}", readStatusId);
+
         if (!readStatusRepository.existsById(readStatusId)) {
             throw new ReadStatusNotFoundException(
                 "ReadStatus with id " + readStatusId + " not found");
         }
         readStatusRepository.deleteById(readStatusId);
+
+        log.info("읽음 상태 삭제 완료 - readStatusId: {}", readStatusId);
     }
 }
