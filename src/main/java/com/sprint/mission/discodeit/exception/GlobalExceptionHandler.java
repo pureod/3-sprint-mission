@@ -133,7 +133,7 @@ public class GlobalExceptionHandler {
                 FieldError::getField,
                 error -> Optional.ofNullable(error.getDefaultMessage())
                     .orElse("유효성 메세지가 존재하지 않음"),
-                (m1, m2) -> m1 + ", " + m2  // 중복 필드는 첫 번째만 유지
+                (m1, m2) -> m1 + ", " + m2
             ));
 
         ErrorResponse response = ErrorResponse.of(
