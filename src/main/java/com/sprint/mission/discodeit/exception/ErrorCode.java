@@ -27,6 +27,7 @@ public enum ErrorCode {
 
     // 파일
     BinaryContent_Not_Found("BinaryContent를 찾을 수 없습니다."),
+    FILE_PROCESSING_FAILED("이미지 처리 중 오류가 발생했습니다."),
 
     // 인증
     Invalid_Username_OR_Password("username 또는 password가 틀렸습니다.");
