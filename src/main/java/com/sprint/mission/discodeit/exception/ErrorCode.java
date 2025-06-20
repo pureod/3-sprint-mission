@@ -20,6 +20,7 @@ public enum ErrorCode {
 
     // 메세지
     Message_Not_Found("Message를 찾을 수 없습니다."),
+    Invalid_Message_Content("내용 또는 첨부파일 중 하나는 반드시 존재해야 합니다."),
 
     // 채널
     Channel_Not_Found("Channel을 찾을 수 없습니다."),

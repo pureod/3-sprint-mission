@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -122,6 +121,7 @@ public class BasicUserService implements UserService {
         String newEmail = userUpdateRequest.newEmail();
 
         if (newUsername != null && (newUsername.length() < 2 || newUsername.length() > 10)) {
+            log.warn("사용자 수정 실패 - 잘못된 사용자명: {}", newUsername);
             throw new InvalidUserUpdateInputException(newUsername);
         }
 

@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.InvalidMessageContentException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
@@ -30,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -52,8 +54,18 @@ public class BasicMessageService implements MessageService {
         UUID channelId = messageCreateRequest.channelId();
         UUID authorId = messageCreateRequest.authorId();
 
+        boolean hasText = StringUtils.hasText(messageCreateRequest.content());
+        boolean hasAttachments =
+            binaryContentCreateRequests != null && !binaryContentCreateRequests.isEmpty();
+
+        if (!hasText && !hasAttachments) {
+            throw new InvalidMessageContentException(messageCreateRequest.content());
+        }
+
         log.info("메시지 생성 중 - channelId: {}, authorId: {}, 첨부파일 수: {}",
-            channelId, authorId, binaryContentCreateRequests.size());
+            channelId, authorId, Optional.ofNullable(binaryContentCreateRequests)
+                .map(List::size)
+                .orElse(0));
 
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> {
@@ -67,22 +79,24 @@ public class BasicMessageService implements MessageService {
                 }
             );
 
-        List<BinaryContent> attachments = binaryContentCreateRequests.stream()
-            .map(attachmentRequest -> {
-                String fileName = attachmentRequest.fileName();
-                String contentType = attachmentRequest.contentType();
-                byte[] bytes = attachmentRequest.bytes();
+        List<BinaryContent> attachments = hasAttachments ?
+            binaryContentCreateRequests.stream()
+                .map(attachmentRequest -> {
+                    String fileName = attachmentRequest.fileName();
+                    String contentType = attachmentRequest.contentType();
+                    byte[] bytes = attachmentRequest.bytes();
 
-                log.debug("메시지 첨부파일 저장 - 파일명: {}, 크기: {} bytes, 타입: {}",
-                    fileName, bytes.length, contentType);
+                    log.debug("메시지 첨부파일 저장 - 파일명: {}, 크기: {} bytes, 타입: {}",
+                        fileName, bytes.length, contentType);
 
-                BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-                    contentType);
-                binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
-                return binaryContent;
-            })
-            .toList();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+                        contentType);
+                    binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(binaryContent.getId(), bytes);
+                    return binaryContent;
+                })
+                .toList()
+            : List.of();
 
         String content = messageCreateRequest.content();
         Message message = new Message(

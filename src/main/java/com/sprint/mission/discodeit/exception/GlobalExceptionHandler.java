@@ -31,7 +31,8 @@ public class GlobalExceptionHandler {
             case "EmailAlreadyExistsException", "UserNameAlreadyExistsException",
                  "ReadStatusAlreadyExistsException", "PrivateChannelModificationException",
                  "InvalidUsernameOrPasswordException", "UserStatusAlreadyExistsException",
-                 "InvalidUserUpdateInputException" -> HttpStatus.BAD_REQUEST;
+                 "InvalidUserUpdateInputException", "InvalidMessageContentException" ->
+                HttpStatus.BAD_REQUEST;
 
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
