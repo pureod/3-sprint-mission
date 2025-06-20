@@ -31,35 +31,28 @@ public class BasicBinaryContentService implements BinaryContentService {
         byte[] bytes = request.bytes();
         String contentType = request.contentType();
 
-        log.info("파일 업로드 시작 - 파일명: {}, 크기: {} bytes, 타입: {}",
-            fileName, bytes.length, contentType);
+        log.info("파일 업로드 시작 - 파일명: {}, 크기: {} bytes, 타입: {}", fileName, bytes.length, contentType);
 
-        BinaryContent binaryContent = new BinaryContent(
-            fileName,
-            (long) bytes.length,
-            contentType
-        );
+        BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
         binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(), bytes);
 
-        log.info("파일 업로드 완료 - fileId: {}, 파일명: {}, 크기: {} bytes",
-            binaryContent.getId(), fileName, bytes.length);
+        log.info("파일 업로드 완료 - fileId: {}, 파일명: {}, 크기: {} bytes", binaryContent.getId(), fileName,
+            bytes.length);
 
         return binaryContentMapper.toDto(binaryContent);
     }
 
     @Override
     public BinaryContentDto find(UUID binaryContentId) {
-        return binaryContentRepository.findById(binaryContentId)
-            .map(binaryContentMapper::toDto)
+        return binaryContentRepository.findById(binaryContentId).map(binaryContentMapper::toDto)
             .orElseThrow(() -> new BinaryContentNotFoundException(binaryContentId));
     }
 
     @Override
     public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
         return binaryContentRepository.findAllById(binaryContentIds).stream()
-            .map(binaryContentMapper::toDto)
-            .toList();
+            .map(binaryContentMapper::toDto).toList();
     }
 
     @Transactional
@@ -68,6 +61,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         log.info("파일 삭제 시작 - fileId: {}", binaryContentId);
 
         if (!binaryContentRepository.existsById(binaryContentId)) {
+            log.warn("파일 삭제 실패 - 존재하지 않는 파일 ID: {}", binaryContentId);
             throw new BinaryContentNotFoundException(binaryContentId);
         }
         binaryContentRepository.deleteById(binaryContentId);

@@ -42,14 +42,19 @@ public class BasicReadStatusService implements ReadStatusService {
         log.info("읽음 상태 생성 중 - userId: {}, channelId: {}", userId, channelId);
 
         User user = userRepository.findById(userId)
-            .orElseThrow(
-                () -> new UserNotFoundException(userId));
+            .orElseThrow(() -> {
+                log.warn("읽음 상태 생성 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                return new UserNotFoundException(userId);
+            });
         Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(
-                () -> new ChannelNotFoundException(channelId)
+            .orElseThrow(() -> {
+                    log.warn("읽음 상태 생성 실패 - 존재하지 않는 채널 ID: {}", channelId);
+                    return new ChannelNotFoundException(channelId);
+                }
             );
 
         if (readStatusRepository.existsByUserIdAndChannelId(user.getId(), channel.getId())) {
+            log.warn("읽음 상태 중복 - 이미 존재함 (userId: {}, channelId: {})", userId, channelId);
             throw new ReadStatusAlreadyExistsException(userId, channelId);
         }
 
@@ -85,8 +90,10 @@ public class BasicReadStatusService implements ReadStatusService {
 
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-            .orElseThrow(
-                () -> new ReadStatusNotFoundException(readStatusId));
+            .orElseThrow(() -> {
+                log.warn("읽음 상태 수정 실패 - 존재하지 않는 readStatusId: {}", readStatusId);
+                return new ReadStatusNotFoundException(readStatusId);
+            });
 
         readStatus.update(newLastReadAt);
 
@@ -101,6 +108,7 @@ public class BasicReadStatusService implements ReadStatusService {
         log.info("읽음 상태 삭제 시작 - readStatusId: {}", readStatusId);
 
         if (!readStatusRepository.existsById(readStatusId)) {
+            log.warn("읽음 상태 삭제 실패 - 존재하지 않는 readStatusId: {}", readStatusId);
             throw new ReadStatusNotFoundException(readStatusId);
         }
         readStatusRepository.deleteById(readStatusId);

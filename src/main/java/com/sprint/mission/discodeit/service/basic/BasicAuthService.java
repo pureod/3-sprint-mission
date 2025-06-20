@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.auth.InvalidUsernameOrPasswordException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -30,8 +29,10 @@ public class BasicAuthService implements AuthService {
         log.info("로그인 인증 시작 - username: {}", username);
 
         User user = userRepository.findByUsername(username)
-            .orElseThrow(
-                () -> new InvalidUsernameOrPasswordException(username));
+            .orElseThrow(() -> {
+                log.warn("로그인 실패 - 존재하지 않는 사용자명: {}", loginRequest.username());
+                return new InvalidUsernameOrPasswordException(username);
+            });
 
         if (!user.getPassword().equals(password)) {
             log.warn("로그인 실패 - 비밀번호 불일치, username: {}", username);

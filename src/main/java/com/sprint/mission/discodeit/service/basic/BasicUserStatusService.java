@@ -38,9 +38,13 @@ public class BasicUserStatusService implements UserStatusService {
         log.info("사용자 상태 생성 중 - userId: {}, lastActiveAt: {}", userId, request.lastActiveAt());
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
+            .orElseThrow(() -> {
+                log.warn("사용자 상태 생성 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                return new UserNotFoundException(userId);
+            });
         Optional.ofNullable(user.getStatus())
             .ifPresent(status -> {
+                log.warn("사용자 상태 생성 실패 - 이미 상태가 존재함 (userStatusId: {})", status.getId());
                 throw new UserStatusAlreadyExistsException(status.getId());
             });
 
@@ -78,8 +82,10 @@ public class BasicUserStatusService implements UserStatusService {
             userStatusId, newLastActiveAt);
 
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-            .orElseThrow(
-                () -> UserStatusNotFoundException.byUserStatusId(userStatusId));
+            .orElseThrow(() -> {
+                log.warn("사용자 상태 수정 실패 - 존재하지 않는 userStatusId: {}", userStatusId);
+                return UserStatusNotFoundException.byUserStatusId(userStatusId);
+            });
         userStatus.update(newLastActiveAt);
 
         log.info("사용자 상태 수정 중 - userStatusId: {}, newLastActiveAt: {}",
@@ -97,8 +103,10 @@ public class BasicUserStatusService implements UserStatusService {
             userId, newLastActiveAt);
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-            .orElseThrow(
-                () -> UserStatusNotFoundException.byUserId(userId));
+            .orElseThrow(() -> {
+                log.warn("사용자 상태 수정 실패 - 존재하지 않는 userId: {}", userId);
+                return UserStatusNotFoundException.byUserId(userId);
+            });
         userStatus.update(newLastActiveAt);
 
         log.info("사용자 ID로 상태 수정 중 - userId: {}, newLastActiveAt: {}",
@@ -113,6 +121,7 @@ public class BasicUserStatusService implements UserStatusService {
         log.info("사용자 상태 삭제 시작 - userStatusId: {}", userStatusId);
 
         if (!userStatusRepository.existsById(userStatusId)) {
+            log.warn("사용자 상태 삭제 실패 - 존재하지 않는 userStatusId: {}", userStatusId);
             throw UserStatusNotFoundException.byUserStatusId(userStatusId);
         }
         userStatusRepository.deleteById(userStatusId);

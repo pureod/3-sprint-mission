@@ -47,9 +47,11 @@ public class BasicUserService implements UserService {
             username, email, optionalProfileCreateRequest.isPresent() ? "있음" : "없음");
 
         if (userRepository.existsByEmail(email)) {
+            log.warn("사용자 생성 실패 - 중복된 이메일: {}", email);
             throw new EmailAlreadyExistsException(email);
         }
         if (userRepository.existsByUsername(username)) {
+            log.warn("사용자 생성 실패 - 중복된 사용자명: {}", username);
             throw new UserNameAlreadyExistsException(username);
         }
 
@@ -105,10 +107,14 @@ public class BasicUserService implements UserService {
 
     @Transactional
     @Override
-    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+    public UserDto update(UUID userId,
+        UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
+            .orElseThrow(() -> {
+                log.warn("⚠️ 사용자 수정 실패 - 존재하지 않는 ID: {}", userId);
+                return new UserNotFoundException(userId);
+            });
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
@@ -118,10 +124,12 @@ public class BasicUserService implements UserService {
             optionalProfileCreateRequest.isPresent() ? "변경" : "변경없음");
 
         if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+            log.warn("사용자 수정 실패 - 중복된 이메일: {}", newEmail);
             throw new EmailAlreadyExistsException(newEmail);
         }
         if (!user.getUsername().equals(newUsername) && userRepository.existsByUsername(
             newUsername)) {
+            log.warn("사용자 수정 실패 - 중복된 사용자명: {}", newUsername);
             throw new UserNameAlreadyExistsException(newUsername);
         }
 
@@ -158,6 +166,7 @@ public class BasicUserService implements UserService {
         log.info("사용자 삭제 시작 - userId: {}", userId);
 
         if (!userRepository.existsById(userId)) {
+            log.warn("사용자 삭제 실패 - 존재하지 않는 ID: {}", userId);
             throw new UserNotFoundException(userId);
         }
 

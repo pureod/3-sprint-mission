@@ -56,11 +56,15 @@ public class BasicMessageService implements MessageService {
             channelId, authorId, binaryContentCreateRequests.size());
 
         Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(
-                () -> new ChannelNotFoundException(channelId));
+            .orElseThrow(() -> {
+                log.warn("메시지 생성 실패 - 존재하지 않는 채널 ID: {}", channelId);
+                return new ChannelNotFoundException(channelId);
+            });
         User author = userRepository.findById(authorId)
-            .orElseThrow(
-                () -> new UserNotFoundException(authorId)
+            .orElseThrow(() -> {
+                    log.warn("메시지 생성 실패 - 존재하지 않는 사용자 ID: {}", authorId);
+                    return new UserNotFoundException(authorId);
+                }
             );
 
         List<BinaryContent> attachments = binaryContentCreateRequests.stream()
@@ -131,8 +135,10 @@ public class BasicMessageService implements MessageService {
         log.info("메시지 수정 중 - messageId: {}", messageId);
 
         Message message = messageRepository.findById(messageId)
-            .orElseThrow(
-                () -> new MessageNotFoundException(messageId));
+            .orElseThrow(() -> {
+                log.warn("메시지 수정 실패 - 존재하지 않는 메시지 ID: {}", messageId);
+                return new MessageNotFoundException(messageId);
+            });
         message.update(newContent);
 
         log.info("메시지 수정 완료 - messageId: {}", messageId);
@@ -146,6 +152,7 @@ public class BasicMessageService implements MessageService {
         log.info("메시지 삭제 시작 - messageId: {}", messageId);
 
         if (!messageRepository.existsById(messageId)) {
+            log.warn("메시지 삭제 실패 - 존재하지 않는 메시지 ID: {}", messageId);
             throw new MessageNotFoundException(messageId);
         }
 

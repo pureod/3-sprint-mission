@@ -103,9 +103,12 @@ public class BasicChannelService implements ChannelService {
         log.info("채널 수정 시작 - channelId: {}, newName: {}", channelId, newName);
 
         Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(
-                () -> new ChannelNotFoundException(channelId));
+            .orElseThrow(() -> {
+                log.warn("채널 수정 실패 - 존재하지 않는 채널 ID: {}", channelId);
+                return new ChannelNotFoundException(channelId);
+            });
         if (channel.getType().equals(ChannelType.PRIVATE)) {
+            log.warn("프라이빗 채널 수정 시도 차단 - channelId: {}", channelId);
             throw new PrivateChannelModificationException(channelId);
         }
         channel.update(newName, newDescription);
@@ -121,6 +124,7 @@ public class BasicChannelService implements ChannelService {
         log.info("채널 삭제 시작 - channelId: {}", channelId);
 
         if (!channelRepository.existsById(channelId)) {
+            log.warn("⚠채널 삭제 실패 - 존재하지 않는 채널 ID: {}", channelId);
             throw new ChannelNotFoundException(channelId);
         }
 
