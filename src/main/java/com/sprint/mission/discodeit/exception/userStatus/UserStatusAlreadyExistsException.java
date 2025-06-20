@@ -7,6 +7,6 @@ import java.util.UUID;
 public class UserStatusAlreadyExistsException extends UserStatusException {
 
     public UserStatusAlreadyExistsException(UUID userStatusId) {
-        super(ErrorCode.UserStatus_Already_Exists, Map.of("userStatusId", userStatusId));
+        super(ErrorCode.USER_STATUS_ALREADY_EXISTS, Map.of("userStatusId", userStatusId));
     }
 }

@@ -6,6 +6,6 @@ import java.util.Map;
 public class InvalidUsernameOrPasswordException extends AuthException {
 
     public InvalidUsernameOrPasswordException(String username) {
-        super(ErrorCode.Invalid_Username_OR_Password, Map.of("username", username));
+        super(ErrorCode.INVALID_USERNAME_OR_PASSWORD, Map.of("username", username));
     }
 }

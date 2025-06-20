@@ -7,7 +7,7 @@ import java.util.UUID;
 public class ReadStatusAlreadyExistsException extends ReadStatusException {
 
     public ReadStatusAlreadyExistsException(UUID userId, UUID channelId) {
-        super(ErrorCode.ReadStatus_Already_Exists,
+        super(ErrorCode.READ_STATUS_ALREADY_EXISTS,
             Map.of("userId", userId, "channelId", channelId));
     }
 }

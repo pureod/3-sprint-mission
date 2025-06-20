@@ -6,6 +6,6 @@ import java.util.Map;
 public class InvalidMessageContentException extends MessageException {
 
     public InvalidMessageContentException(String content) {
-        super(ErrorCode.Invalid_Message_Content, Map.of("content", content));
+        super(ErrorCode.INVALID_MESSAGE_CONTENT, Map.of("content", content));
     }
 }

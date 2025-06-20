@@ -7,6 +7,6 @@ import java.util.UUID;
 public class ReadStatusNotFoundException extends ReadStatusException {
 
     public ReadStatusNotFoundException(UUID readStatusId) {
-        super(ErrorCode.BinaryContent_Not_Found, Map.of("readStatusId", readStatusId));
+        super(ErrorCode.READ_STATUS_NOT_FOUND, Map.of("readStatusId", readStatusId));
     }
 }

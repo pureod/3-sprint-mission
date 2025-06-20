@@ -6,6 +6,6 @@ import java.util.Map;
 public class InvalidUserUpdateInputException extends UserException {
 
     public InvalidUserUpdateInputException(String newUsername) {
-        super(ErrorCode.Invalid_User_Update_Input, Map.of("newUsername", newUsername));
+        super(ErrorCode.INVALID_USER_UPDATE_INPUT, Map.of("newUsername", newUsername));
     }
 }

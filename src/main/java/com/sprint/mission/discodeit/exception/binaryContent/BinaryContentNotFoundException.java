@@ -7,6 +7,6 @@ import java.util.UUID;
 public class BinaryContentNotFoundException extends BinaryContentException {
 
     public BinaryContentNotFoundException(UUID binaryContentId) {
-        super(ErrorCode.BinaryContent_Not_Found, Map.of("binaryContentId", binaryContentId));
+        super(ErrorCode.BINARY_CONTENT_NOT_FOUND, Map.of("binaryContentId", binaryContentId));
     }
 }

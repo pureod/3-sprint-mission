@@ -6,6 +6,6 @@ import java.util.Map;
 public class UserNameAlreadyExistsException extends UserException {
 
     public UserNameAlreadyExistsException(String username) {
-        super(ErrorCode.UserName_Already_Exists, Map.of("username", username));
+        super(ErrorCode.USERNAME_ALREADY_EXISTS, Map.of("username", username));
     }
 }

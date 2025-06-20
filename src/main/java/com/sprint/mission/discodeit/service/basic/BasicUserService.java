@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.user.InvalidUserUpdateInputException;
 import com.sprint.mission.discodeit.exception.user.UserNameAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -119,11 +118,6 @@ public class BasicUserService implements UserService {
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
-
-        if (newUsername != null && (newUsername.length() < 2 || newUsername.length() > 10)) {
-            log.warn("사용자 수정 실패 - 잘못된 사용자명: {}", newUsername);
-            throw new InvalidUserUpdateInputException(newUsername);
-        }
 
         log.info("사용자 수정 중 - userId: {}, newUsername: {}, newEmail: {}, 프로필 이미지: {}",
             userId, newUsername, newEmail,

@@ -6,6 +6,6 @@ import java.util.Map;
 public class EmailAlreadyExistsException extends UserException {
 
     public EmailAlreadyExistsException(String email) {
-        super(ErrorCode.Email_Already_Exists, Map.of("email", email));
+        super(ErrorCode.EMAIL_ALREADY_EXISTS, Map.of("email", email));
     }
 }

@@ -7,7 +7,7 @@ import java.util.UUID;
 public class UserStatusNotFoundException extends UserStatusException {
 
     private UserStatusNotFoundException(String key, Object value) {
-        super(ErrorCode.UserStatus_Not_Found, Map.of(key, value));
+        super(ErrorCode.USER_STATUS_NOT_FOUND, Map.of(key, value));
     }
 
     public static UserStatusNotFoundException byUserId(UUID userId) {
