@@ -3,7 +3,7 @@ spring:
     name: discodeit
 
   profiles:
-    active: prod  # 기본은 dev, 운영 시 prod로 교체
+    active: dev  # 기본은 dev, 운영 시 prod로 교체
 
   jpa:
     generate-ddl: false

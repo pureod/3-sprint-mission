@@ -6,10 +6,10 @@ import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.custom.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.readStatus.ReadStatusAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.readStatus.ReadStatusNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -17,7 +17,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,17 +43,14 @@ public class BasicReadStatusService implements ReadStatusService {
 
         User user = userRepository.findById(userId)
             .orElseThrow(
-                () -> new UserNotFoundException("User with id " + userId + " does not exist"));
+                () -> new UserNotFoundException(userId));
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(
-                () -> new ChannelNotFoundException(
-                    "Channel with id " + channelId + " does not exist")
+                () -> new ChannelNotFoundException(channelId)
             );
 
         if (readStatusRepository.existsByUserIdAndChannelId(user.getId(), channel.getId())) {
-            throw new ReadStatusAlreadyExistsException(
-                "ReadStatus with userId " + userId + " and channelId " + channelId
-                    + " already exists");
+            throw new ReadStatusAlreadyExistsException(userId, channelId);
         }
 
         Instant lastReadAt = request.lastReadAt();
@@ -72,8 +68,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusRepository.findById(readStatusId)
             .map(readStatusMapper::toDto)
             .orElseThrow(
-                () -> new ReadStatusNotFoundException(
-                    "ReadStatus with id " + readStatusId + " not found"));
+                () -> new ReadStatusNotFoundException(readStatusId));
     }
 
     @Override
@@ -91,8 +86,7 @@ public class BasicReadStatusService implements ReadStatusService {
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(
-                () -> new ReadStatusNotFoundException(
-                    "ReadStatus with id " + readStatusId + " not found"));
+                () -> new ReadStatusNotFoundException(readStatusId));
 
         readStatus.update(newLastReadAt);
 
@@ -107,8 +101,7 @@ public class BasicReadStatusService implements ReadStatusService {
         log.info("읽음 상태 삭제 시작 - readStatusId: {}", readStatusId);
 
         if (!readStatusRepository.existsById(readStatusId)) {
-            throw new ReadStatusNotFoundException(
-                "ReadStatus with id " + readStatusId + " not found");
+            throw new ReadStatusNotFoundException(readStatusId);
         }
         readStatusRepository.deleteById(readStatusId);
 

@@ -7,9 +7,9 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.custom.user.EmailAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNameAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNameAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -18,7 +18,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -48,12 +47,10 @@ public class BasicUserService implements UserService {
             username, email, optionalProfileCreateRequest.isPresent() ? "있음" : "없음");
 
         if (userRepository.existsByEmail(email)) {
-            throw new EmailAlreadyExistsException(
-                "User with email " + email + " already exists");
+            throw new EmailAlreadyExistsException(email);
         }
         if (userRepository.existsByUsername(username)) {
-            throw new UserNameAlreadyExistsException(
-                "User with username " + username + " already exists");
+            throw new UserNameAlreadyExistsException(username);
         }
 
         BinaryContent nullableProfile = optionalProfileCreateRequest
@@ -95,7 +92,7 @@ public class BasicUserService implements UserService {
     public UserDto find(UUID userId) {
         return userRepository.findById(userId)
             .map(userMapper::toDto)
-            .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     @Override
@@ -111,7 +108,7 @@ public class BasicUserService implements UserService {
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
@@ -121,13 +118,11 @@ public class BasicUserService implements UserService {
             optionalProfileCreateRequest.isPresent() ? "변경" : "변경없음");
 
         if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
-            throw new EmailAlreadyExistsException(
-                "User with email " + newEmail + " already exists");
+            throw new EmailAlreadyExistsException(newEmail);
         }
         if (!user.getUsername().equals(newUsername) && userRepository.existsByUsername(
             newUsername)) {
-            throw new UserNameAlreadyExistsException(
-                "User with username " + newUsername + " already exists");
+            throw new UserNameAlreadyExistsException(newUsername);
         }
 
         BinaryContent nullableProfile = optionalProfileCreateRequest
@@ -163,7 +158,7 @@ public class BasicUserService implements UserService {
         log.info("사용자 삭제 시작 - userId: {}", userId);
 
         if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User with id " + userId + " not found");
+            throw new UserNotFoundException(userId);
         }
 
         userRepository.deleteById(userId);

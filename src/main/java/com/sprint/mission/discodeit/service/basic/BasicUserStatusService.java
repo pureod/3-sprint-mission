@@ -5,16 +5,15 @@ import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.custom.userStatus.UserStatusAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.custom.userStatus.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +38,10 @@ public class BasicUserStatusService implements UserStatusService {
         log.info("사용자 상태 생성 중 - userId: {}, lastActiveAt: {}", userId, request.lastActiveAt());
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
         Optional.ofNullable(user.getStatus())
             .ifPresent(status -> {
-                throw new UserStatusAlreadyExistsException(
-                    "UserStatus with id " + userId + " already exists");
+                throw new UserStatusAlreadyExistsException(status.getId());
             });
 
         Instant lastActiveAt = request.lastActiveAt();
@@ -61,8 +59,7 @@ public class BasicUserStatusService implements UserStatusService {
         return userStatusRepository.findById(userStatusId)
             .map(userStatusMapper::toDto)
             .orElseThrow(
-                () -> new UserStatusNotFoundException(
-                    "UserStatus with id " + userStatusId + " not found"));
+                () -> UserStatusNotFoundException.byUserId(userStatusId));
     }
 
     @Override
@@ -82,8 +79,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
             .orElseThrow(
-                () -> new UserStatusNotFoundException(
-                    "UserStatus with id " + userStatusId + " not found"));
+                () -> UserStatusNotFoundException.byUserStatusId(userStatusId));
         userStatus.update(newLastActiveAt);
 
         log.info("사용자 상태 수정 중 - userStatusId: {}, newLastActiveAt: {}",
@@ -102,8 +98,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
             .orElseThrow(
-                () -> new UserStatusNotFoundException(
-                    "UserStatus with userId " + userId + " not found"));
+                () -> UserStatusNotFoundException.byUserId(userId));
         userStatus.update(newLastActiveAt);
 
         log.info("사용자 ID로 상태 수정 중 - userId: {}, newLastActiveAt: {}",
@@ -118,8 +113,7 @@ public class BasicUserStatusService implements UserStatusService {
         log.info("사용자 상태 삭제 시작 - userStatusId: {}", userStatusId);
 
         if (!userStatusRepository.existsById(userStatusId)) {
-            throw new UserStatusNotFoundException(
-                "UserStatus with id " + userStatusId + " not found");
+            throw UserStatusNotFoundException.byUserStatusId(userStatusId);
         }
         userStatusRepository.deleteById(userStatusId);
 
