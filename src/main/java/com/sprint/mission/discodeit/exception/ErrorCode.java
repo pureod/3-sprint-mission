@@ -30,7 +30,10 @@ public enum ErrorCode {
     FILE_PROCESSING_FAILED("이미지 처리 중 오류가 발생했습니다."),
 
     // 인증
-    Invalid_Username_OR_Password("username 또는 password가 틀렸습니다.");
+    Invalid_Username_OR_Password("username 또는 password가 틀렸습니다."),
+
+    // 유효성
+    Invalid_User_Update_Input("사용자명은 2자 이상 10자 이하여야 합니다.");
 
     private final String message;
 

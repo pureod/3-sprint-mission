@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.InvalidUserUpdateInputException;
 import com.sprint.mission.discodeit.exception.user.UserNameAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -112,12 +114,16 @@ public class BasicUserService implements UserService {
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
-                log.warn("⚠️ 사용자 수정 실패 - 존재하지 않는 ID: {}", userId);
+                log.warn("사용자 수정 실패 - 존재하지 않는 ID: {}", userId);
                 return new UserNotFoundException(userId);
             });
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
+
+        if (newUsername != null && (newUsername.length() < 2 || newUsername.length() > 10)) {
+            throw new InvalidUserUpdateInputException(newUsername);
+        }
 
         log.info("사용자 수정 중 - userId: {}, newUsername: {}, newEmail: {}, 프로필 이미지: {}",
             userId, newUsername, newEmail,

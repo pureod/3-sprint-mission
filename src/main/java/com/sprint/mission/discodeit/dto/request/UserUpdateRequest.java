@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 public record UserUpdateRequest(
-    @Size(min = 2, max = 10, message = "사용자명은 3자 이상 20자 이하로 입력해주세요.")
     String newUsername,
 
     @Email(message = "유효한 이메일 형식이어야 합니다")
