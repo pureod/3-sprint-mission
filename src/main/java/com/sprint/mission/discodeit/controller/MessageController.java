@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.exception.binaryContent.InvalidFileProcessingException;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class MessageController implements MessageApi {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> create(
-        @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+        @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         log.info("메시지 생성 요청 - channelId: {}, userId: {}, 첨부파일 수: {}",
@@ -70,8 +71,10 @@ public class MessageController implements MessageApi {
     }
 
     @PatchMapping(path = "{messageId}")
-    public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
-        @RequestBody MessageUpdateRequest request) {
+    public ResponseEntity<MessageDto> update(
+        @PathVariable("messageId") UUID messageId,
+        @Valid @RequestBody MessageUpdateRequest request
+    ) {
         log.info("메시지 수정 요청 - messageId: {}", messageId);
 
         MessageDto updatedMessage = messageService.update(messageId, request);

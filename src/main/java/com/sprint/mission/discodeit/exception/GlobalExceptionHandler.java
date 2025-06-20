@@ -2,14 +2,19 @@ package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.dto.response.ErrorResponse;
 import java.time.Instant;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -117,15 +122,25 @@ public class GlobalExceptionHandler {
         MethodArgumentNotValidException e) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
+        log.warn("[Validation] 유효성 검사 실패 - {}", e.getMessage());
+
         String message = e.getBindingResult().getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .collect(Collectors.joining(", "));
+
+        Map<String, Object> details = e.getBindingResult().getFieldErrors().stream()
+            .collect(Collectors.toMap(
+                FieldError::getField,
+                error -> Optional.ofNullable(error.getDefaultMessage())
+                    .orElse("유효성 메세지가 존재하지 않음"),
+                (m1, m2) -> m1 + ", " + m2  // 중복 필드는 첫 번째만 유지
+            ));
 
         ErrorResponse response = ErrorResponse.of(
             Instant.now(),
             "VALIDATION_ERROR",
             message,
-            null,
+            details,
             e.getClass().getSimpleName(),
             status
         );
