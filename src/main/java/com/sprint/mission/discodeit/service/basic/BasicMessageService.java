@@ -127,6 +127,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
         Pageable pageable) {
+
+        log.info("메시지 목록 조회 요청 - channelId: {}, createdAt: {}, pageSize: {}",
+            channelId, createAt, pageable.getPageSize());
+
         Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
                 Optional.ofNullable(createAt).orElse(Instant.now()),
                 pageable)
@@ -137,6 +141,9 @@ public class BasicMessageService implements MessageService {
             nextCursor = slice.getContent().get(slice.getContent().size() - 1)
                 .createdAt();
         }
+
+        log.info("메시지 목록 조회 성공 - 조회 수: {}, nextCursor: {}",
+            slice.getNumberOfElements(), nextCursor);
 
         return pageResponseMapper.fromSlice(slice, nextCursor);
     }
