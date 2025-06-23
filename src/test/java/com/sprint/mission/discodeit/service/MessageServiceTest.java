@@ -281,21 +281,22 @@ public class MessageServiceTest {
         given(messageRepository.findAllByChannelIdWithAuthor(channelId, createdAt, pageable))
             .willReturn(messageSlice);
 
-        MessageDto dto1 = new MessageDto(
+        MessageDto messageDto1 = new MessageDto(
             message1.getId(), Instant.parse("2024-01-01T08:00:00Z"), null,
             "첫 번째 메시지", channelId,
             mock(UserDto.class), List.of());
 
-        MessageDto dto2 = new MessageDto(
+        MessageDto messageDto2 = new MessageDto(
             message2.getId(), Instant.parse("2024-01-02T08:00:00Z"), null,
             "두 번째 메시지", channelId,
             mock(UserDto.class), List.of());
 
-        given(messageMapper.toDto(message1)).willReturn(dto1);
-        given(messageMapper.toDto(message2)).willReturn(dto2);
+        given(messageMapper.toDto(message1)).willReturn(messageDto1);
+        given(messageMapper.toDto(message2)).willReturn(messageDto2);
 
-        Slice<MessageDto> dtoSlice = new SliceImpl<>(List.of(dto1, dto2), pageable, true);
-        Instant expectedNextCursor = dto2.createdAt();
+        Slice<MessageDto> dtoSlice = new SliceImpl<>(List.of(messageDto1, messageDto2), pageable,
+            true);
+        Instant expectedNextCursor = messageDto2.createdAt();
 
         given(pageResponseMapper.fromSlice(dtoSlice, expectedNextCursor))
             .willReturn(new PageResponse<>(dtoSlice.getContent(), expectedNextCursor,
