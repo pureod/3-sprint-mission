@@ -10,7 +10,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,19 +31,19 @@ import org.springframework.test.context.ActiveProfiles;
 public class MessageRepositoryTest {
 
     @Autowired
-    EntityManager em;
+    private EntityManager em;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ChannelRepository channelRepository;
+    private ChannelRepository channelRepository;
 
     @Autowired
-    MessageRepository messageRepository;
+    private MessageRepository messageRepository;
 
     @Autowired
-    UserStatusRepository userStatusRepository;
+    private UserStatusRepository userStatusRepository;
 
     @Nested
     @DisplayName("채널 ID 기반 메시지 삭제")
@@ -184,11 +187,43 @@ public class MessageRepositoryTest {
             assertThat(resultSlice.hasNext()).isFalse();
         }
 
-        private Instant truncateToMicros(Instant instant) {
-            long micros = instant.getEpochSecond() * 1_000_000 + instant.getNano() / 1_000;
-            return Instant.ofEpochSecond(micros / 1_000_000, (micros % 1_000_000) * 1_000);
-        }
+    }
 
+    @Test
+    @DisplayName("채널 ID로 가장 마지막 메시지 시간 조회 - 메시지가 존재하는 경우")
+    void findLastMessageAtByChannelId_success() throws InterruptedException {
+        // Given
+        User user = userRepository.save(new User("tester", "test@example.com", "pw1234!!", null));
+        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "테스트 채널", "설명"));
+
+        Message msg1 = new Message("첫 번째", channel, user, null);
+        messageRepository.saveAndFlush(msg1);  // flush!
+
+        Thread.sleep(10);  // 시간 간격
+
+        Message msg2 = new Message("두 번째", channel, user, null);
+        messageRepository.saveAndFlush(msg2);
+
+        // When
+        Optional<Instant> result = messageRepository.findLastMessageAtByChannelId(channel.getId());
+
+        Instant expected = truncateToMicros(toUtc(msg2.getCreatedAt().minusSeconds(9 * 60 * 60)));
+        Instant actual = truncateToMicros(result.get());
+
+        // Then
+        assertThat(result).isPresent();
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    private Instant toUtc(Instant instant) {
+        return instant.atZone(ZoneId.systemDefault())
+            .withZoneSameInstant(ZoneOffset.UTC)
+            .toInstant();
+    }
+
+    private Instant truncateToMicros(Instant instant) {
+        long micros = instant.getEpochSecond() * 1_000_000 + instant.getNano() / 1_000;
+        return Instant.ofEpochSecond(micros / 1_000_000, (micros % 1_000_000) * 1_000);
     }
 
 }
