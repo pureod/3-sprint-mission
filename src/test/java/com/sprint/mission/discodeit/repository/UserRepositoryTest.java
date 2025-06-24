@@ -2,12 +2,10 @@ package com.sprint.mission.discodeit.repository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.discodeit.config.TestJpaConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.fixture.BinaryContentFixture;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.List;
@@ -19,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -121,7 +118,7 @@ public class UserRepositoryTest {
     @DisplayName("프로필과 상태를 fetch join하여 모든 유저를 조회한다")
     void findAllWithProfileAndStatus_should_return_users_with_profile_and_status() {
         // Given
-        BinaryContent profile = BinaryContentFixture.createValid();
+        BinaryContent profile = createValidBinaryContent();
         User user = new User("tester", "tester@example.com", "pw1234!!", profile);
         em.persist(profile);
         em.persist(user);
@@ -139,5 +136,12 @@ public class UserRepositoryTest {
         assertThat(users.get(0).getProfile().getFileName()).isEqualTo(profile.getFileName());
     }
 
+    public static BinaryContent createValidBinaryContent() {
+        return new BinaryContent(
+            "sample-image.png",
+            2048L,
+            "image/png"
+        );
+    }
 
 }

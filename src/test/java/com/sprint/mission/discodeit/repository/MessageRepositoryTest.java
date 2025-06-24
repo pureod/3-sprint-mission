@@ -212,13 +212,13 @@ public class MessageRepositoryTest {
             1000); //Instant와 timestamp의 정밀도 차이를 보정
     }
 
-    private Instant toUtc(Instant instant) {
+    private static Instant toUtc(Instant instant) {
         return instant.atZone(ZoneId.systemDefault())
             .withZoneSameInstant(ZoneOffset.UTC)
             .toInstant();
     }
 
-    private Instant truncateToMicros(Instant instant) {
+    private static Instant truncateToMicros(Instant instant) {
         long micros = instant.getEpochSecond() * 1_000_000 + instant.getNano() / 1_000;
         return Instant.ofEpochSecond(micros / 1_000_000, (micros % 1_000_000) * 1_000);
     }
