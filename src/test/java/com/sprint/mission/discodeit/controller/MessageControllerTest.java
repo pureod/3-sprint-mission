@@ -70,7 +70,7 @@ class MessageControllerTest {
             given(messageService.create(eq(messageCreateRequest), any())).willReturn(messageDto);
 
             MockMultipartFile messageCreateRequestFile
-                = toJsonPart("messageCreateRequest", messageCreateRequest);
+                = toJsonPart(messageCreateRequest);
 
             MockMultipartFile attachmentsPart = fakeImagePart();
 
@@ -90,7 +90,6 @@ class MessageControllerTest {
             // Given
             UUID channelId = UUID.randomUUID();
             UUID authorID = UUID.randomUUID();
-            UserDto userDto = new UserDto(authorID, "martin", "clean@code.com", null, null);
 
             MessageCreateRequest messageCreateRequest
                 = new MessageCreateRequest("클린 코드", channelId, authorID);
@@ -99,7 +98,7 @@ class MessageControllerTest {
                 .willThrow(new InvalidFileProcessingException("Invalid file"));
 
             MockMultipartFile messageCreateRequestFile
-                = toJsonPart("messageCreateRequest", messageCreateRequest);
+                = toJsonPart(messageCreateRequest);
 
             MockMultipartFile attachmentsPart = fakeImagePart();
 
@@ -196,10 +195,10 @@ class MessageControllerTest {
     }
 
 
-    private MockMultipartFile toJsonPart(String partName, Object value) throws Exception {
+    private MockMultipartFile toJsonPart(Object value) throws Exception {
         return new MockMultipartFile(
-            partName,
-            partName + ".json",
+            "messageCreateRequest",
+            "messageCreateRequest" + ".json",
             "application/json",
             objectMapper.writeValueAsBytes(value)
         );
