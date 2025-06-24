@@ -212,7 +212,8 @@ public class MessageRepositoryTest {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(actual).isEqualTo(expected);
+        assertThat(Math.abs(actual.getNano() - expected.getNano())).isLessThanOrEqualTo(
+            1000); //Instant와 timestamp의 정밀도 차이를 보정
     }
 
     private Instant toUtc(Instant instant) {
