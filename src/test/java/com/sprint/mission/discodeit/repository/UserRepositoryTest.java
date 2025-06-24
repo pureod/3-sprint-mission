@@ -39,9 +39,6 @@ public class UserRepositoryTest {
         // When
         Optional<User> result = userRepository.findByUsername("leejooyong");
 
-        System.out.println("아이디 = " + result.get().getId());
-        System.out.println("시간 = " + result.get().getCreatedAt());
-
         // Then
         assertThat(result).isPresent();
         assertThat(result.get().getUsername()).isEqualTo("leejooyong");
