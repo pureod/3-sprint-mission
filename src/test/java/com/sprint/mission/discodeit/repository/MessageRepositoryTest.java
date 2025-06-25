@@ -193,9 +193,9 @@ public class MessageRepositoryTest {
         Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "테스트 채널", "설명"));
 
         Message msg1 = new Message("첫 번째", channel, user, null);
-        messageRepository.saveAndFlush(msg1);  // flush!
+        messageRepository.saveAndFlush(msg1);
 
-        Thread.sleep(10);  // 시간 간격
+        Thread.sleep(10);
 
         Message msg2 = new Message("두 번째", channel, user, null);
         messageRepository.saveAndFlush(msg2);
@@ -209,7 +209,7 @@ public class MessageRepositoryTest {
         // Then
         assertThat(result).isPresent();
         assertThat(Math.abs(actual.getNano() - expected.getNano())).isLessThanOrEqualTo(
-            1000); //Instant와 timestamp의 정밀도 차이를 보정
+            1000);
     }
 
     private static Instant toUtc(Instant instant) {
