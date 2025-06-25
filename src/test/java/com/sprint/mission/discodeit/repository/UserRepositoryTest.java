@@ -56,7 +56,8 @@ public class UserRepositoryTest {
         @DisplayName("사용자를 저장한 뒤, 이메일 존재 여부를 확인할 수 있다")
         void save_then_check_email_exists_should_return_true() {
             // Given
-            userRepository.save(new User("jake", "jake@example.com", "pw123!!", null));
+            User user = new User("jake", "jake@example.com", "pw123!!", null);
+            userRepository.save(user);
 
             // When
             boolean exists = userRepository.existsByEmail("jake@example.com");
@@ -69,8 +70,8 @@ public class UserRepositoryTest {
         @DisplayName("존재하지 않는 이메일로 조화하면 실패한다")
         void save_then_check_email_exists_should_return_false() {
             // Given
-            userRepository.save(new User("jake", "jake@example.com", "pw123!!", null));
-
+            User user = new User("jake", "jake@example.com", "pw123!!", null);
+            userRepository.save(user);
             // When
             boolean exists = userRepository.existsByEmail("duke@example.com");
 
@@ -88,7 +89,8 @@ public class UserRepositoryTest {
         @DisplayName("사용자를 저장한 뒤, 사용자명 존재 여부를 확인할 수 있다.")
         void find_by_existent_username_should_return_true() {
             // Given
-            userRepository.save(new User("jake", "jake@example.com", "pw123!!", null));
+            User user = new User("jake", "jake@example.com", "pw123!!", null);
+            userRepository.save(user);
 
             // When
             boolean exists = userRepository.existsByUsername("jake");
@@ -101,7 +103,8 @@ public class UserRepositoryTest {
         @DisplayName("존재하지 않는 username으로 조회하면 실패한다")
         void find_by_nonexistent_username_should_return_empty() {
             // Given
-            userRepository.save(new User("jake", "jake@example.com", "pw123!!", null));
+            User user = new User("jake", "jake@example.com", "pw123!!", null);
+            userRepository.save(user);
 
             // When
             boolean exists = userRepository.existsByUsername("duke");
