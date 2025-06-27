@@ -154,7 +154,8 @@ public class MessageRepositoryTest {
 
         @Test
         @DisplayName("메시지를 조회한 후 커서를 옮겼을 때 다음 페이지가 정확히 조회되는 경우")
-        void findAllByChannelIdWithAuthor_should_return_slice_before_createdAt_with_correct_next_page() {
+        void findAllByChannelIdWithAuthor_should_return_slice_before_createdAt_with_correct_next_page()
+            throws InterruptedException {
             // Given
             User author = new User("tester", "test@example.com", "pw1234!!", null);
             userRepository.save(author);
@@ -164,10 +165,13 @@ public class MessageRepositoryTest {
             channelRepository.save(channel);
 
             Message message1 = new Message("메시지 1", channel, author, null);
+            Thread.sleep(500);
             messageRepository.saveAndFlush(message1);
             Message message2 = new Message("메시지 2", channel, author, null);
+            Thread.sleep(500);
             messageRepository.saveAndFlush(message2);
             Message message3 = new Message("메시지 3", channel, author, null);
+            Thread.sleep(500);
             messageRepository.saveAndFlush(message3);
 
             Instant cursorTime = truncateToMicros(message2.getCreatedAt());
