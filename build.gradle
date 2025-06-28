@@ -58,6 +58,8 @@ dependencies {
 
     implementation 'org.slf4j:slf4j-api'
 
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
+
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile

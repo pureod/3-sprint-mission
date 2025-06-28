@@ -2,6 +2,12 @@ spring:
   application:
     name: discodeit
 
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
+
   profiles:
     active: prod  # 기본은 dev, 운영 시 prod로 교체
 
