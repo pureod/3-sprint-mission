@@ -82,7 +82,7 @@ public class S3BinaryContentStorageTest {
         System.out.println(
             "response.getHeaders().getLocation() = " + response.getHeaders().getLocation());
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.TEMPORARY_REDIRECT);
         assertThat(response.getHeaders().getLocation()).isNotNull();
 
     }
