@@ -43,3 +43,24 @@ bin/
 
 ### Storage ###
 .storage
+
+### Logs ###
+logs
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+discodeit.env
+
+# Docker
+docker-compose.override.yml
+docker-compose.yml
+
+### AWS 관련 민감 파일들 ###
+*.pem
+*.key
+aws-credentials.txt
+.aws/
+credentials
+config
