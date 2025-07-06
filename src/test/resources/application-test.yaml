@@ -24,19 +24,6 @@ spring:
     show-sql: true
     open-in-view: false
 
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: ./test-storage
-    s3:
-      access-key: dummy
-      secret-key: dummy
-      region: us-east-1
-      bucket: test-bucket
-      presigned-url-expiration: 3600
-
-
 logging:
   level:
     org.hibernate.SQL: debug
