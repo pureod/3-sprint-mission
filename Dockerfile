@@ -8,7 +8,6 @@ COPY gradlew gradlew.bat ./
 COPY gradle ./gradle
 COPY build.gradle settings.gradle ./
 COPY src ./src
-COPY .storage /app/.storage
 
 RUN chmod +x ./gradlew
 RUN ./gradlew clean build -x test
