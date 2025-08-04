@@ -24,7 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class UserRepositoryTest {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private EntityManager em;
