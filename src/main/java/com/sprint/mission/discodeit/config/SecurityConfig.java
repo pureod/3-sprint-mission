@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.auth.handler.LoginFailureHandler;
+import com.sprint.mission.discodeit.auth.handler.LoginSuccessHandler;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.springframework.boot.CommandLineRunner;
@@ -42,7 +44,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(
-        HttpSecurity http
+        HttpSecurity http,
+        LoginSuccessHandler loginSuccessHandler,
+        LoginFailureHandler loginFailureHandler
     ) throws Exception {
 
         System.out.println("[SecurityConfig] FilterChain 구성 시작 - Form 기반 로그인 사용");
@@ -51,7 +55,13 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+            )
+            .formLogin(login -> login
+                .loginProcessingUrl("/api/auth/login")
+                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
             );
+
         return http.build();
     }
 
