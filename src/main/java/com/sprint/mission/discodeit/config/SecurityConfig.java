@@ -20,6 +20,11 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 public class SecurityConfig {
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public CommandLineRunner debugFilterChain(SecurityFilterChain filterChain) {
 
         return args -> {
