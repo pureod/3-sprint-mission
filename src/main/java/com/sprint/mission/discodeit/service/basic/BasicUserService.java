@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
@@ -22,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -175,5 +178,32 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(userId);
 
         log.info("사용자 삭제 완료 - userId: {}", userId);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    @Override
+    public UserDto updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest) {
+
+        UUID userId = userRoleUpdateRequest.userId();
+        Role newRole = userRoleUpdateRequest.newRole();
+
+        log.info("사용자 권한 변경 시작");
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+
+        String username = user.getUsername();
+        Role oldRole = user.getRole();
+
+        log.info("사용자: {}", username);
+        log.info("기존 권한: {}, 새 권한: {}", oldRole, newRole);
+
+        user.updateRole(newRole);
+        User updatedUser = userRepository.save(user);
+
+        log.info("사용자 권한 변경 완료");
+
+        return userMapper.toDto(updatedUser);
     }
 }

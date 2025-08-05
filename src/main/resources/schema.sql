@@ -28,9 +28,13 @@ CREATE TABLE users
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
     profile_id uuid,
+    role       varchar(20)              NOT NULL,
     CONSTRAINT fk_users_profile FOREIGN KEY (profile_id)
         REFERENCES binary_contents (id) ON DELETE SET NULL
 );
+
+ALTER TABLE users
+    ADD role varchar(20) NOT NULL default 'USER';
 
 -- user_statuses
 CREATE TABLE user_statuses

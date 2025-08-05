@@ -2,14 +2,20 @@ package com.sprint.mission.discodeit.auth.controller;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.auth.service.AuthService;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.actuate.autoconfigure.metrics.PropertiesAutoTimer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private final UserService userService;
     private final AuthService authService;
 
     @GetMapping("/csrf-token")
@@ -52,5 +59,22 @@ public class AuthController {
         log.debug("[AuthController] 사용자 정보 조회 완료: {}", userResponse);
 
         return ResponseEntity.ok(userResponse);
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<UserDto> updateUserRole(
+        @Valid @RequestBody UserRoleUpdateRequest userRoleUpdateRequest
+    ) {
+        log.debug("[AuthController] 사용자 권한 변경 요청");
+        log.debug("[AuthController] 요청 데이터: " + userRoleUpdateRequest);
+
+        try {
+            UserDto userResponse = userService.updateUserRole(userRoleUpdateRequest);
+            log.debug("[AuthController] 권한 변경 성공: " + userResponse);
+            return ResponseEntity.ok(userResponse);
+        } catch (IllegalArgumentException e) {
+            log.debug("[AuthController] 권한 변경 실패: " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 }
