@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DiscodeitUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
-    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return userRepository.findByUsername(username)
