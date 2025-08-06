@@ -180,30 +180,4 @@ public class BasicUserService implements UserService {
         log.info("사용자 삭제 완료 - userId: {}", userId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    @Override
-    public UserDto updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest) {
-
-        UUID userId = userRoleUpdateRequest.userId();
-        Role newRole = userRoleUpdateRequest.newRole();
-
-        log.info("사용자 권한 변경 시작");
-
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
-
-        String username = user.getUsername();
-        Role oldRole = user.getRole();
-
-        log.info("사용자: {}", username);
-        log.info("기존 권한: {}, 새 권한: {}", oldRole, newRole);
-
-        user.updateRole(newRole);
-        User updatedUser = userRepository.save(user);
-
-        log.info("사용자 권한 변경 완료");
-
-        return userMapper.toDto(updatedUser);
-    }
 }

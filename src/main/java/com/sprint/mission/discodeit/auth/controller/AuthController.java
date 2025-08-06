@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.auth.controller;
 import com.sprint.mission.discodeit.auth.service.AuthService;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserService userService;
     private final AuthService authService;
 
     @GetMapping("/csrf-token")
@@ -65,14 +63,14 @@ public class AuthController {
         @Valid @RequestBody UserRoleUpdateRequest userRoleUpdateRequest
     ) {
         log.debug("[AuthController] 사용자 권한 변경 요청");
-        log.debug("[AuthController] 요청 데이터: " + userRoleUpdateRequest);
+        log.debug("[AuthController] 요청 데이터: {}", userRoleUpdateRequest);
 
         try {
-            UserDto userResponse = userService.updateUserRole(userRoleUpdateRequest);
-            log.debug("[AuthController] 권한 변경 성공: " + userResponse);
+            UserDto userResponse = authService.updateUserRole(userRoleUpdateRequest);
+            log.debug("[AuthController] 권한 변경 성공: {}", userResponse);
             return ResponseEntity.ok(userResponse);
         } catch (IllegalArgumentException e) {
-            log.debug("[AuthController] 권한 변경 실패: " + e.getMessage());
+            log.debug("[AuthController] 권한 변경 실패: {}", e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }

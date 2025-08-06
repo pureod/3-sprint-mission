@@ -22,6 +22,4 @@ public interface UserService {
         Optional<BinaryContentCreateRequest> profileCreateRequest);
 
     void delete(UUID userId);
-
-    UserDto updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest);
 }
