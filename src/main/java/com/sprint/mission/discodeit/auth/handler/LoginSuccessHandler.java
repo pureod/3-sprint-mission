@@ -3,10 +3,13 @@ package com.sprint.mission.discodeit.auth.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
     public void onAuthenticationSuccess(
@@ -31,6 +35,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         if (authentication.getPrincipal() instanceof DiscodeitUserDetails discodeitUserDetails) {
             UserDto userResponse = discodeitUserDetails.getUserDto();
+            UUID userID = userResponse.id();
+
+            updateUserStatus(userID);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -48,5 +55,18 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                 .getClass());
         }
 
+    }
+
+    private void updateUserStatus(UUID userID) {
+        try {
+            userStatusRepository.findByUserId(userID)
+                .ifPresent(userStatus -> {
+                    userStatus.update(Instant.now());
+                    userStatusRepository.save(userStatus);
+                    log.debug("사용자 온라인 상태 업데이트 완료");
+                });
+        } catch (Exception e) {
+            log.error("사용자 상태 업데이트 실패");
+        }
     }
 }
