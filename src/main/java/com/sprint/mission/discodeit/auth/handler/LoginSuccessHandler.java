@@ -37,8 +37,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             UserDto userResponse = discodeitUserDetails.getUserDto();
             UUID userID = userResponse.id();
 
-            updateUserStatus(userID);
-
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_OK);
@@ -55,18 +53,5 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                 .getClass());
         }
 
-    }
-
-    private void updateUserStatus(UUID userID) {
-        try {
-            userStatusRepository.findByUserId(userID)
-                .ifPresent(userStatus -> {
-                    userStatus.update(Instant.now());
-                    userStatusRepository.save(userStatus);
-                    log.debug("사용자 온라인 상태 업데이트 완료");
-                });
-        } catch (Exception e) {
-            log.error("사용자 상태 업데이트 실패");
-        }
     }
 }

@@ -1,21 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNameAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -24,7 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
+    private final SessionRegistry sessionRegistry;
 
     @Transactional
     @Override
@@ -85,7 +83,7 @@ public class BasicUserService implements UserService {
 
         User user = new User(username, email, encodedPassword, nullableProfile);
         Instant now = Instant.now();
-        UserStatus userStatus = new UserStatus(user, now);
+        UserDto userDto = userMapper.toDto(user);
 
         userRepository.save(user);
 
@@ -102,11 +100,16 @@ public class BasicUserService implements UserService {
             .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {
-        return userRepository.findAllWithProfileAndStatus()
-            .stream()
-            .map(userMapper::toDto)
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+            .map(user -> {
+                boolean online = isUserOnline(user.getId());
+                return userMapper.toDto(user, online);
+            })
             .toList();
     }
 
@@ -162,7 +165,8 @@ public class BasicUserService implements UserService {
         log.info("사용자 수정 완료 - userId: {}, username: {}, email: {}",
             userId, newUsername, newEmail);
 
-        return userMapper.toDto(user);
+        boolean online = isUserOnline(user.getId());
+        return userMapper.toDto(user, online);
     }
 
     @Transactional
@@ -180,4 +184,30 @@ public class BasicUserService implements UserService {
         log.info("사용자 삭제 완료 - userId: {}", userId);
     }
 
+    @Override
+    public boolean isUserOnline(UUID userId) {
+        if (userId == null) {
+            return false;
+        }
+
+        List<Object> principals = sessionRegistry.getAllPrincipals();
+
+        for (Object principal : principals) {
+            if (principal instanceof DiscodeitUserDetails userDetails) {
+                if (userId.equals(userDetails.getUserDto().id())) {
+                    List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal,
+                        false);
+                    boolean hasActiveSessions = sessions.stream()
+                        .anyMatch(session -> !session.isExpired());
+
+                    log.debug("[BasicUserService] 사용자 {} 온라인 상태: {}", userId, hasActiveSessions);
+                    return hasActiveSessions;
+                }
+            }
+        }
+
+        log.debug("[BasicUserService] 사용자 {} 온라인 상태: false (세션 없음)", userId);
+        return false;
+
+    }
 }

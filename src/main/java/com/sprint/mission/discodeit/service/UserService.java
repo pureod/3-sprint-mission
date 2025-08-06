@@ -22,4 +22,6 @@ public interface UserService {
         Optional<BinaryContentCreateRequest> profileCreateRequest);
 
     void delete(UUID userId);
+
+    boolean isUserOnline(UUID userId);
 }
