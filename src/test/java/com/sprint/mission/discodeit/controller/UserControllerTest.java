@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNameAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,9 +49,6 @@ public class UserControllerTest {
     @MockitoBean
     private UserService userService;
 
-    @MockitoBean
-    private UserStatusService userStatusService;
-
     @BeforeEach
     @DisplayName("테스트 환경 설정 확인")
     void setUp() {
@@ -59,7 +56,6 @@ public class UserControllerTest {
         assert mockMvc != null;
         assert objectMapper != null;
         assert userService != null;
-        assert userStatusService != null;
     }
 
     @Nested
@@ -72,7 +68,8 @@ public class UserControllerTest {
             // given
             UserCreateRequest userCreateRequest = new UserCreateRequest("테스트", "test@gmail.com",
                 "!password123");
-            UserDto userDto = new UserDto(UUID.randomUUID(), "테스트", "test@gmail.com", null, null);
+            UserDto userDto = new UserDto(UUID.randomUUID(), "테스트", "test@gmail.com", null, null,
+                Role.ADMIN);
 
             given(userService.create(eq(userCreateRequest), any())).willReturn(userDto);
 
@@ -150,7 +147,7 @@ public class UserControllerTest {
                 = new UserUpdateRequest("수정테스트", "newemail@example.com", "!password123!");
 
             UserDto updatedUser = new UserDto(userId, "수정테스트", "newemail@example.com", null,
-                null);
+                null, Role.ADMIN);
 
             given(userService.update(eq(userId), eq(userUpdateRequest), any()))
                 .willReturn(updatedUser);

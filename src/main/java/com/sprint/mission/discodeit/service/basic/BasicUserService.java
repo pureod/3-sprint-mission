@@ -82,8 +82,6 @@ public class BasicUserService implements UserService {
         String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
 
         User user = new User(username, email, encodedPassword, nullableProfile);
-        Instant now = Instant.now();
-        UserDto userDto = userMapper.toDto(user);
 
         userRepository.save(user);
 

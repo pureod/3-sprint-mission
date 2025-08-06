@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,6 @@ public class AdminInitializer implements CommandLineRunner {
             null,
             Role.ADMIN
         );
-        UserStatus userStatus = new UserStatus(admin, Instant.now());
         userRepository.save(admin);
 
         log.info("[AdminInitializer] 기본 관리자 계정이 생성되었습니다. username: {}", adminUsername);

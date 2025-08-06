@@ -10,13 +10,13 @@ import static org.mockito.BDDMockito.then;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.Optional;
@@ -37,8 +37,6 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserStatusRepository userStatusRepository;
-    @Mock
     private UserMapper userMapper;
     @Mock
     private BinaryContentRepository binaryContentRepository;
@@ -52,7 +50,6 @@ class UserServiceTest {
     @DisplayName("테스트 환경 설정 확인")
     void setUp() {
         assertNotNull(userRepository);
-        assertNotNull(userStatusRepository);
         assertNotNull(userMapper);
         assertNotNull(binaryContentRepository);
         assertNotNull(binaryContentStorage);
@@ -73,7 +70,8 @@ class UserServiceTest {
 
             UserCreateRequest request = new UserCreateRequest(username, email, password);
             User savedUser = new User(username, email, password, null);
-            UserDto expectedDto = new UserDto(UUID.randomUUID(), username, email, null, null);
+            UserDto expectedDto = new UserDto(UUID.randomUUID(), username, email, null, null,
+                Role.ADMIN);
 
             given(userRepository.existsByEmail(email)).willReturn(false);
             given(userRepository.existsByUsername(username)).willReturn(false);
@@ -136,12 +134,13 @@ class UserServiceTest {
 
             UserUpdateRequest request = new UserUpdateRequest(newUsername, newEmail, newPassword);
             User existingUser = new User("oldUser", "old@user.com", "!password123", null);
-            UserDto expectedDto = new UserDto(userId, newUsername, newEmail, null, null);
+            UserDto expectedDto = new UserDto(userId, newUsername, newEmail, null, true,
+                Role.ADMIN);
 
             given(userRepository.findById(userId)).willReturn(Optional.of(existingUser));
             given(userRepository.existsByEmail(newEmail)).willReturn(false);
             given(userRepository.existsByUsername(newUsername)).willReturn(false);
-            given(userMapper.toDto(existingUser)).willReturn(expectedDto);
+            given(userMapper.toDto(existingUser, false)).willReturn(expectedDto);
 
             // When
             UserDto result = userService.update(userId, request, Optional.empty());
@@ -155,7 +154,7 @@ class UserServiceTest {
             then(userRepository).should().findById(userId);
             then(userRepository).should().existsByEmail(newEmail);
             then(userRepository).should().existsByUsername(newUsername);
-            then(userMapper).should().toDto(existingUser);
+            then(userMapper).should().toDto(existingUser, false);
             then(binaryContentRepository).shouldHaveNoInteractions();
             then(binaryContentStorage).shouldHaveNoInteractions();
 
