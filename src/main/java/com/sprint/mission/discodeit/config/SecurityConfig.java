@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.config;
 import com.sprint.mission.discodeit.auth.handler.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.auth.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.auth.handler.LoginSuccessHandler;
+import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetailsService;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +76,8 @@ public class SecurityConfig {
         LoginSuccessHandler loginSuccessHandler,
         LoginFailureHandler loginFailureHandler,
         SessionRegistry sessionRegistry,
-        CustomAccessDeniedHandler customAccessDeniedHandler) throws Exception {
+        CustomAccessDeniedHandler customAccessDeniedHandler,
+        DiscodeitUserDetailsService discodeitUserDetailsService) throws Exception {
 
         System.out.println("[SecurityConfig] FilterChain 구성 시작 - Form 기반 로그인 사용");
 
@@ -101,6 +103,12 @@ public class SecurityConfig {
                     .maxSessionsPreventsLogin(false)
                     .sessionRegistry(sessionRegistry)
                 )
+            )
+            .rememberMe(remember -> remember
+                .rememberMeParameter("remember-me")
+                .tokenValiditySeconds(60)
+                .alwaysRemember(false)
+                .userDetailsService(discodeitUserDetailsService)
             )
             .formLogin(login -> login
                 .loginProcessingUrl("/api/auth/login")
