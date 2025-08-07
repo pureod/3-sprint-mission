@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -107,6 +108,7 @@ public class BasicUserService implements UserService {
             .toList();
     }
 
+    @PreAuthorize("#userId == principal.userDto.id()")
     @Transactional
     @Override
     public UserDto update(UUID userId,
@@ -162,6 +164,7 @@ public class BasicUserService implements UserService {
         return setOnlineStatus(userMapper.toDto(user));
     }
 
+    @PreAuthorize("#userId == principal.userDto.id()")
     @Transactional
     @Override
     public void delete(UUID userId) {
