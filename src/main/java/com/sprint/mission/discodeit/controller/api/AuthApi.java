@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.auth.controller.api;
+package com.sprint.mission.discodeit.controller.api;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 

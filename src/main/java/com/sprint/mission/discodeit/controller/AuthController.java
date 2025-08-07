@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.auth.controller;
+package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.auth.service.AuthService;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import jakarta.validation.Valid;
