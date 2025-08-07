@@ -15,13 +15,11 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -88,13 +86,14 @@ public class BasicUserService implements UserService {
         log.info("사용자 생성 완료 - userId: {}, username: {}, email: {}",
             user.getId(), username, email);
 
-        return userMapper.toDto(user);
+        return setOnlineStatus(userMapper.toDto(user));
+
     }
 
     @Override
     public UserDto find(UUID userId) {
         return userRepository.findById(userId)
-            .map(userMapper::toDto)
+            .map(user -> setOnlineStatus(userMapper.toDto(user)))
             .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
@@ -104,10 +103,7 @@ public class BasicUserService implements UserService {
         List<User> users = userRepository.findAll();
 
         return users.stream()
-            .map(user -> {
-                boolean online = isUserOnline(user.getId());
-                return userMapper.toDto(user, online);
-            })
+            .map(user -> setOnlineStatus(userMapper.toDto(user)))
             .toList();
     }
 
@@ -163,8 +159,7 @@ public class BasicUserService implements UserService {
         log.info("사용자 수정 완료 - userId: {}, username: {}, email: {}",
             userId, newUsername, newEmail);
 
-        boolean online = isUserOnline(user.getId());
-        return userMapper.toDto(user, online);
+        return setOnlineStatus(userMapper.toDto(user));
     }
 
     @Transactional
@@ -184,28 +179,36 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean isUserOnline(UUID userId) {
+
         if (userId == null) {
             return false;
         }
 
-        List<Object> principals = sessionRegistry.getAllPrincipals();
+        boolean isOnline = sessionRegistry.getAllPrincipals().stream()
+            .filter(DiscodeitUserDetails.class::isInstance)
+            .map(DiscodeitUserDetails.class::cast)
+            .filter(userDetails -> userId.equals(userDetails.getUserDto().id()))
+            .anyMatch(userDetails ->
+                sessionRegistry.getAllSessions(userDetails, false).stream()
+                    .anyMatch(session -> !session.isExpired())
+            );
 
-        for (Object principal : principals) {
-            if (principal instanceof DiscodeitUserDetails userDetails) {
-                if (userId.equals(userDetails.getUserDto().id())) {
-                    List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal,
-                        false);
-                    boolean hasActiveSessions = sessions.stream()
-                        .anyMatch(session -> !session.isExpired());
-
-                    log.debug("[BasicUserService] 사용자 {} 온라인 상태: {}", userId, hasActiveSessions);
-                    return hasActiveSessions;
-                }
-            }
-        }
-
-        log.debug("[BasicUserService] 사용자 {} 온라인 상태: false (세션 없음)", userId);
-        return false;
-
+        log.debug("[BasicUserService] 사용자 {} 온라인 상태: {}", userId, isOnline);
+        return isOnline;
     }
+
+    private UserDto setOnlineStatus(UserDto userDto) {
+
+        boolean online = isUserOnline(userDto.id());
+
+        return new UserDto(
+            userDto.id(),
+            userDto.username(),
+            userDto.email(),
+            userDto.profile(),
+            online,
+            userDto.role()
+        );
+    }
+
 }
