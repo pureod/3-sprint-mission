@@ -79,7 +79,7 @@ public class SecurityConfig {
         CustomAccessDeniedHandler customAccessDeniedHandler,
         DiscodeitUserDetailsService discodeitUserDetailsService) throws Exception {
 
-        System.out.println("[SecurityConfig] FilterChain 구성 시작 - Form 기반 로그인 사용");
+        log.debug("[SecurityConfig] FilterChain 구성 시작 - Form 기반 로그인 사용");
 
         http
             .csrf(csrf -> csrf
