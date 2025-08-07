@@ -1,3 +1,6 @@
+ALTER TABLE users
+    ADD role varchar(20) NOT NULL default 'USER';
+
 -- drop all tables
 DROP TABLE IF EXISTS binary_contents CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -32,9 +35,6 @@ CREATE TABLE users
     CONSTRAINT fk_users_profile FOREIGN KEY (profile_id)
         REFERENCES binary_contents (id) ON DELETE SET NULL
 );
-
-ALTER TABLE users
-    ADD role varchar(20) NOT NULL default 'USER';
 
 -- user_statuses
 CREATE TABLE user_statuses

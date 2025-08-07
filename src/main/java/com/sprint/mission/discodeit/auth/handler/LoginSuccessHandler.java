@@ -43,6 +43,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             log.debug("[LoginSuccessHandler] 로그인 성공 응답 완료: " + userResponse.username());
         } else {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\": \"인증 정보를 처리할 수 없습니다.\"}");
 

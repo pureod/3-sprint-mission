@@ -49,9 +49,18 @@ public class BasicAuthService implements AuthService {
 
         UserDto userResponse = userMapper.toDto(user);
 
+        boolean online = !sessionRegistry.getAllSessions(userDetails, false).isEmpty();
+
         log.debug("[AuthService] userDto: {}", userResponse);
 
-        return userResponse;
+        return new UserDto(
+            userResponse.id(),
+            userResponse.username(),
+            userResponse.email(),
+            userResponse.profile(),
+            online,
+            userResponse.role()
+        );
     }
 
     @PreAuthorize("hasRole('ADMIN')")
