@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,12 +21,14 @@ import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNameAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.servlet.http.Cookie;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -35,6 +38,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @WebMvcTest(UserController.class)
 @Import({GlobalExceptionHandler.class})
@@ -48,6 +52,8 @@ public class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    private final String TOKEN = "mock-token";
 
     @BeforeEach
     @DisplayName("테스트 환경 설정 확인")
@@ -82,7 +88,8 @@ public class UserControllerTest {
             mockMvc.perform(multipart(HttpMethod.POST, "/api/users")
                     .file(userCreateRequestFile)
                     .file(profilePart)
-                    .contentType(MediaType.MULTIPART_FORM_DATA))
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .with(csrf()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("테스트"))
                 .andExpect(jsonPath("$.email").value("test@gmail.com"));

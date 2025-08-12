@@ -29,6 +29,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserService 단위 테스트")
@@ -42,6 +44,10 @@ class UserServiceTest {
     private BinaryContentRepository binaryContentRepository;
     @Mock
     private BinaryContentStorage binaryContentStorage;
+    @Mock
+    private SessionRegistry sessionRegistry;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private BasicUserService userService;
@@ -76,6 +82,7 @@ class UserServiceTest {
             given(userRepository.existsByEmail(email)).willReturn(false);
             given(userRepository.existsByUsername(username)).willReturn(false);
             given(userRepository.save(any(User.class))).willReturn(savedUser);
+            given(sessionRegistry.getAllPrincipals()).willReturn(java.util.List.of());
             given(userMapper.toDto(any(User.class))).willReturn(expectedDto);
 
             // When
@@ -140,7 +147,7 @@ class UserServiceTest {
             given(userRepository.findById(userId)).willReturn(Optional.of(existingUser));
             given(userRepository.existsByEmail(newEmail)).willReturn(false);
             given(userRepository.existsByUsername(newUsername)).willReturn(false);
-            given(userMapper.toDto(existingUser, false)).willReturn(expectedDto);
+            given(userMapper.toDto(existingUser)).willReturn(expectedDto);
 
             // When
             UserDto result = userService.update(userId, request, Optional.empty());
@@ -154,7 +161,7 @@ class UserServiceTest {
             then(userRepository).should().findById(userId);
             then(userRepository).should().existsByEmail(newEmail);
             then(userRepository).should().existsByUsername(newUsername);
-            then(userMapper).should().toDto(existingUser, false);
+            then(userMapper).should().toDto(existingUser);
             then(binaryContentRepository).shouldHaveNoInteractions();
             then(binaryContentStorage).shouldHaveNoInteractions();
 
