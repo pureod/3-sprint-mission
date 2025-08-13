@@ -159,7 +159,7 @@ public class JwtTokenProvider {
         response.addCookie(cookie);
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateAccessToken(String token) {
 
         log.debug("[TokenProvider] validateAccessToken 호출됨: 토큰 유효성 검사 시작");
 
