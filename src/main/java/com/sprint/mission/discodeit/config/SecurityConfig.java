@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.auth.handler.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.auth.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.auth.handler.LoginSuccessHandler;
 import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetailsService;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -73,7 +75,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(
         HttpSecurity http,
         DaoAuthenticationProvider authenticationProvider,
-        LoginSuccessHandler loginSuccessHandler,
+        JwtLoginSuccessHandler jwtLoginSuccessHandler,
         LoginFailureHandler loginFailureHandler,
         SessionRegistry sessionRegistry,
         CustomAccessDeniedHandler customAccessDeniedHandler,
@@ -97,12 +99,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/logout").permitAll()
                 .anyRequest().authenticated()
             )
-            .sessionManagement(management -> management
-                .sessionConcurrency(concurrency -> concurrency
-                    .maximumSessions(1)
-                    .maxSessionsPreventsLogin(false)
-                    .sessionRegistry(sessionRegistry)
-                )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .rememberMe(remember -> remember
                 .rememberMeParameter("remember-me")
@@ -112,7 +110,7 @@ public class SecurityConfig {
             )
             .formLogin(login -> login
                 .loginProcessingUrl("/api/auth/login")
-                .successHandler(loginSuccessHandler)
+                .successHandler(jwtLoginSuccessHandler)
                 .failureHandler(loginFailureHandler)
             )
             .logout(logout -> logout

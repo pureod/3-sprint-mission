@@ -10,18 +10,6 @@ DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS read_statuses CASCADE;
 DROP TABLE IF EXISTS message_attachments CASCADE;
 
-DROP TABLE IF EXISTS tbl_jwt_token CASCADE;
-CREATE TABLE IF NOT EXISTS tbl_jwt_token
-(
-    jti         VARCHAR(64) PRIMARY KEY,
-    username    VARCHAR(255) NOT NULL,
-    token_type  VARCHAR(16)  NOT NULL CHECK (token_type IN ('access', 'refresh')),
-    issued_at   TIMESTAMPTZ  NOT NULL,
-    expires_at  TIMESTAMPTZ  NOT NULL,
-    revoked     BOOLEAN      NOT NULL DEFAULT FALSE,
-    replaced_by VARCHAR(64)
-);
-
 -- binary_contents
 CREATE TABLE binary_contents
 (

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
 
-    public static final String REFRESH_TOKEN_COOKIE_NAME = "REFRESH-TOKEN";
+    public static final String REFRESH_TOKEN_COOKIE_NAME = "REFRESH_TOKEN";
 
     private final int accessTokenExpirationMs;
     private final int refreshTokenExpirationMs;
@@ -216,12 +216,12 @@ public class JwtTokenProvider {
 
     public String getUsernameFromToken(String token) {
         try {
-            System.out.println("[TokenProvider] getUsernameFromToken 호출됨: subject 추출 시작");
+            log.debug("[TokenProvider] getUsernameFromToken 호출됨: subject 추출 시작");
 
             SignedJWT signedJWT = SignedJWT.parse(token);
             String subject = signedJWT.getJWTClaimsSet().getSubject();
 
-            System.out.println("[TokenProvider] getUsernameFromToken 결과: subject=" + subject);
+            log.debug("[TokenProvider] getUsernameFromToken 결과: subject=" + subject);
 
             return subject;
         } catch (Exception e) {
@@ -231,12 +231,12 @@ public class JwtTokenProvider {
 
     public String getTokenId(String token) {
         try {
-            System.out.println("[TokenProvider] getTokenId 호출됨: jti 추출 시작");
+            log.debug("[TokenProvider] getTokenId 호출됨: jti 추출 시작");
 
             SignedJWT signedJWT = SignedJWT.parse(token);
             String jti = signedJWT.getJWTClaimsSet().getJWTID();
 
-            System.out.println("[TokenProvider] getTokenId 결과: jti=" + jti);
+            log.debug("[TokenProvider] getTokenId 결과: jti=" + jti);
 
             return jti;
         } catch (Exception e) {
@@ -246,12 +246,12 @@ public class JwtTokenProvider {
 
     public Date getIssuedAt(String token) {
         try {
-            System.out.println("[TokenProvider] getIssuedAt 호출됨: iat 추출 시작");
+            log.debug("[TokenProvider] getIssuedAt 호출됨: iat 추출 시작");
 
             SignedJWT signedJWT = SignedJWT.parse(token);
             Date iat = signedJWT.getJWTClaimsSet().getIssueTime();
 
-            System.out.println("[TokenProvider] getIssuedAt 결과: iat=" + iat);
+            log.debug("[TokenProvider] getIssuedAt 결과: iat=" + iat);
 
             return iat;
         } catch (Exception e) {
@@ -261,12 +261,12 @@ public class JwtTokenProvider {
 
     public Date getExpiration(String token) {
         try {
-            System.out.println("[TokenProvider] getExpiration 호출됨: exp 추출 시작");
+            log.debug("[TokenProvider] getExpiration 호출됨: exp 추출 시작");
 
             SignedJWT signedJWT = SignedJWT.parse(token);
             Date exp = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-            System.out.println("[TokenProvider] getExpiration 결과: exp=" + exp);
+            log.debug("[TokenProvider] getExpiration 결과: exp=" + exp);
 
             return exp;
         } catch (Exception e) {
