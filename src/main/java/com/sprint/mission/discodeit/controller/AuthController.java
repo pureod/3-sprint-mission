@@ -1,17 +1,24 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.service.AuthService;
+import com.nimbusds.jose.JOSEException;
+import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.exception.auth.InvalidTokenException;
+import com.sprint.mission.discodeit.security.jwt.JwtDto;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
+import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final DiscodeitUserDetailsService userDetailsService;
 
     @GetMapping("/csrf-token")
     public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
@@ -34,28 +43,45 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<UserDto> getCurrentUser(
-        @AuthenticationPrincipal UserDetails userDetails
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtDto> refreshToken(
+        @CookieValue(
+            name = JwtTokenProvider.REFRESH_TOKEN_COOKIE_NAME,
+            required = false
+        )
+        String refreshToken,
+        HttpServletResponse response
     ) {
 
-        log.debug("[AuthController] 세션 기반 사용자 정보 조회 요청(me) 들어옴.");
+        log.debug("[AuthController] 리프레시 토큰 재발급 요청");
 
-        if (userDetails == null) {
-            log.debug("[AuthController] 비인증 사용자 (인증 정보 null)");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        if (refreshToken == null || !jwtTokenProvider.validateRefreshToken(refreshToken)) {
+            throw new InvalidTokenException("유효하지 않은 refreshToken입니다");
         }
 
-        UserDto userResponse = authService.getCurrentUserInfo(userDetails);
+        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
 
-        if (userResponse == null) {
-            log.debug("[AuthController] AuthService 에서 사용자 정보를 가져올 수 없음");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        DiscodeitUserDetails userDetails =
+            (DiscodeitUserDetails) userDetailsService.loadUserByUsername(username);
+
+        try {
+            String newAccessToken = jwtTokenProvider.generateAccessToken(userDetails);
+            String newRefreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
+
+            jwtTokenProvider.expireRefreshCookie(response);
+            jwtTokenProvider.addRefreshCookie(response, newRefreshToken);
+
+            JwtDto jwtDto = new JwtDto(userDetails.getUserDto(), newAccessToken);
+
+            log.debug("[AuthController] 토큰 재발급 완료 - username: {}", username);
+
+            return ResponseEntity.status(HttpStatus.OK).body(jwtDto);
+
+        } catch (JOSEException e) {
+            log.error("[AuthController] 토큰 생성 중 오류 발생", e);
+            throw new InvalidTokenException("토큰 생성 중 오류가 발생했습니다");
+
         }
-
-        log.debug("[AuthController] 사용자 정보 조회 완료: {}", userResponse);
-
-        return ResponseEntity.ok(userResponse);
     }
 
     @PutMapping("/role")

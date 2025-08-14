@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.auth.handler.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.auth.handler.LoginFailureHandler;
-import com.sprint.mission.discodeit.auth.handler.LoginSuccessHandler;
-import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetailsService;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -29,6 +28,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -75,11 +75,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(
         HttpSecurity http,
         DaoAuthenticationProvider authenticationProvider,
+        JwtAuthenticationFilter jwtAuthenticationFilter,
         JwtLoginSuccessHandler jwtLoginSuccessHandler,
         LoginFailureHandler loginFailureHandler,
-        SessionRegistry sessionRegistry,
-        CustomAccessDeniedHandler customAccessDeniedHandler,
-        DiscodeitUserDetailsService discodeitUserDetailsService) throws Exception {
+        CustomAccessDeniedHandler customAccessDeniedHandler) throws Exception {
 
         log.debug("[SecurityConfig] FilterChain 구성 시작 - Form 기반 로그인 사용");
 
@@ -87,6 +86,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .ignoringRequestMatchers(request -> {
+                    String auth = request.getHeader("Authorization");
+                    return auth != null && auth.startsWith("Bearer ");
+                })
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/").permitAll()
@@ -97,21 +100,17 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/logout").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .rememberMe(remember -> remember
-                .rememberMeParameter("remember-me")
-                .tokenValiditySeconds(60)
-                .alwaysRemember(false)
-                .userDetailsService(discodeitUserDetailsService)
-            )
             .formLogin(login -> login
                 .loginProcessingUrl("/api/auth/login")
                 .successHandler(jwtLoginSuccessHandler)
                 .failureHandler(loginFailureHandler)
+                .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/api/auth/logout")
@@ -121,7 +120,8 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
                 .accessDeniedHandler(customAccessDeniedHandler)
             )
-            .authenticationProvider(authenticationProvider);
+            .authenticationProvider(authenticationProvider)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
