@@ -26,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider tokenProvider;
     private final DiscodeitUserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -37,10 +38,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String token = resolveToken(request);
 
+            if (token != null) {
+                log.debug("[Filter] AT(head/tail) = {}...{}",
+                    token.substring(0, 12), token.substring(token.length() - 12));
+                log.debug("[Filter] RegistryHas? {}",
+                    jwtRegistry.hasActiveJwtInformationByAccessToken(token));
+            }
+
             if (StringUtils.hasText(token)) {
                 log.debug("[JwtAuthenticationFilter] Bearer 토큰 추출 성공");
 
-                if (tokenProvider.validateAccessToken(token)) {
+                if (tokenProvider.validateAccessToken(token)
+                    && jwtRegistry.hasActiveJwtInformationByAccessToken(token)) {
+
                     String username = tokenProvider.getUsernameFromToken(token);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -54,11 +64,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+
                     log.debug("[JwtAuthenticationFilter] SecurityContext 인증 설정 완료: username={}",
                         username);
+
                 } else {
                     log.debug("[JwtAuthenticationFilter] 토큰 유효성 검사 실패");
-                    sendUnauthorized(response, "Invalid JWT token");
+                    sendUnauthorized(response, "유효하지 않은 토큰으로 접근하였습니다");
                     return;
                 }
             }

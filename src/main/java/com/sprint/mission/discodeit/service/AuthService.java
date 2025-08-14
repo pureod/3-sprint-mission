@@ -10,5 +10,4 @@ public interface AuthService {
 
     UserDto updateUserRole(UserRoleUpdateRequest userRoleUpdateRequest);
 
-    void invalidateUserSessions(String username);
 }

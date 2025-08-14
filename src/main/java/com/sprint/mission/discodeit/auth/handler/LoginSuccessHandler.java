@@ -32,7 +32,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         if (authentication.getPrincipal() instanceof DiscodeitUserDetails discodeitUserDetails) {
             UserDto userResponse = discodeitUserDetails.getUserDto();
-            UUID userID = userResponse.id();
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");

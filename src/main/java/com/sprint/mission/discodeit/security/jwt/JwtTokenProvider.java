@@ -244,34 +244,5 @@ public class JwtTokenProvider {
         }
     }
 
-    public Date getIssuedAt(String token) {
-        try {
-            log.debug("[TokenProvider] getIssuedAt 호출됨: iat 추출 시작");
-
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            Date iat = signedJWT.getJWTClaimsSet().getIssueTime();
-
-            log.debug("[TokenProvider] getIssuedAt 결과: iat=" + iat);
-
-            return iat;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token", e);
-        }
-    }
-
-    public Date getExpiration(String token) {
-        try {
-            log.debug("[TokenProvider] getExpiration 호출됨: exp 추출 시작");
-
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            Date exp = signedJWT.getJWTClaimsSet().getExpirationTime();
-
-            log.debug("[TokenProvider] getExpiration 결과: exp=" + exp);
-
-            return exp;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token", e);
-        }
-    }
 
 }

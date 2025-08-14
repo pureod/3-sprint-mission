@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -13,6 +12,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -37,6 +37,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final SessionRegistry sessionRegistry;
+    private final JwtRegistry jwtRegistry;
 
     @Transactional
     @Override
@@ -187,17 +188,20 @@ public class BasicUserService implements UserService {
             return false;
         }
 
-        boolean isOnline = sessionRegistry.getAllPrincipals().stream()
-            .filter(DiscodeitUserDetails.class::isInstance)
-            .map(DiscodeitUserDetails.class::cast)
-            .filter(userDetails -> userId.equals(userDetails.getUserDto().id()))
-            .anyMatch(userDetails ->
-                sessionRegistry.getAllSessions(userDetails, false).stream()
-                    .anyMatch(session -> !session.isExpired())
-            );
+//        // 세션 기반 온라인 상태 확인
+//        boolean isOnlineBySession = sessionRegistry.getAllPrincipals().stream()
+//            .filter(DiscodeitUserDetails.class::isInstance)
+//            .map(DiscodeitUserDetails.class::cast)
+//            .filter(userDetails -> userId.equals(userDetails.getUserDto().id()))
+//            .anyMatch(userDetails ->
+//                sessionRegistry.getAllSessions(userDetails, false).stream()
+//                    .anyMatch(session -> !session.isExpired())
+//            );
 
-        log.debug("[BasicUserService] 사용자 {} 온라인 상태: {}", userId, isOnline);
-        return isOnline;
+        // JWT 기반 온라인 상태 확인
+
+        return jwtRegistry.hasActiveJwtInformationByUserId(userId);
+
     }
 
     private UserDto setOnlineStatus(UserDto userDto) {

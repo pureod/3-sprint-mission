@@ -20,6 +20,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider tokenProvider;
+    private final JwtRegistry jwtRegistry;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -37,9 +38,19 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
                 log.debug("[JwtLoginSuccessHandler] JWT 토큰 발급 시작 - username={}",
                     discodeitUserDetails.getUsername());
 
+                jwtRegistry.invalidateJwtInformationByUserId(discodeitUserDetails.userId());
+
                 log.debug("[JwtLoginSuccessHandler] 새 토큰 발급 시작");
                 String accessToken = tokenProvider.generateAccessToken(discodeitUserDetails);
                 String refreshToken = tokenProvider.generateRefreshToken(discodeitUserDetails);
+
+                JwtInformation jwtInformation = new JwtInformation(
+                    discodeitUserDetails.getUserDto(),
+                    accessToken,
+                    refreshToken
+                );
+
+                jwtRegistry.registerJwtInformation(jwtInformation);
 
                 log.debug("[JwtLoginSuccessHandler] 리프레시 쿠키 설정 시작");
                 tokenProvider.addRefreshCookie(response, refreshToken);

@@ -7,13 +7,14 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.exception.auth.InvalidTokenException;
 import com.sprint.mission.discodeit.security.jwt.JwtDto;
+import com.sprint.mission.discodeit.security.jwt.JwtInformation;
+import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -33,6 +34,8 @@ public class AuthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
     private final DiscodeitUserDetailsService userDetailsService;
+    private final JwtRegistry jwtRegistry;
+    private final JwtTokenProvider tokenProvider;
 
     @GetMapping("/csrf-token")
     public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
@@ -64,6 +67,8 @@ public class AuthController {
         DiscodeitUserDetails userDetails =
             (DiscodeitUserDetails) userDetailsService.loadUserByUsername(username);
 
+        UserDto userDto = userDetails.getUserDto();
+
         try {
             String newAccessToken = jwtTokenProvider.generateAccessToken(userDetails);
             String newRefreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
@@ -71,11 +76,14 @@ public class AuthController {
             jwtTokenProvider.expireRefreshCookie(response);
             jwtTokenProvider.addRefreshCookie(response, newRefreshToken);
 
-            JwtDto jwtDto = new JwtDto(userDetails.getUserDto(), newAccessToken);
-
             log.debug("[AuthController] 토큰 재발급 완료 - username: {}", username);
 
-            return ResponseEntity.status(HttpStatus.OK).body(jwtDto);
+            JwtInformation newInfo = new JwtInformation(userDto, newAccessToken, newRefreshToken);
+
+            jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
+            tokenProvider.addRefreshCookie(response, newRefreshToken);
+
+            return ResponseEntity.ok(JwtDto.of(userDto, newAccessToken));
 
         } catch (JOSEException e) {
             log.error("[AuthController] 토큰 생성 중 오류 발생", e);

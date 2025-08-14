@@ -106,3 +106,4 @@ jwt:
   refresh-token:
     secret: Avz2YMsZ2ze5hAP3uU7rH6Yi40IbJwpDA8NVTWM4ezY
     exp: 3600000
+  max-concurrent-session: 1

@@ -5,7 +5,10 @@ import com.sprint.mission.discodeit.auth.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -32,6 +35,7 @@ import org.springframework.security.web.authentication.Http403ForbiddenEntryPoin
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
@@ -87,12 +91,13 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                .ignoringRequestMatchers("/api/auth/refresh")
-                .ignoringRequestMatchers("/api/auth/logout")
-                .ignoringRequestMatchers(request -> {
-                    String auth = request.getHeader("Authorization");
-                    return auth != null && auth.startsWith("Bearer ");
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler() {
+                    @Override
+                    public void handle(HttpServletRequest request, HttpServletResponse response,
+                        Supplier<CsrfToken> csrfToken) {
+                        super.handle(request, response, csrfToken);
+                        csrfToken.get();
+                    }
                 })
             )
             .authorizeHttpRequests(auth -> auth
