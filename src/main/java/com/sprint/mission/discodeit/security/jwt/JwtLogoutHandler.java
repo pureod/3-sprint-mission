@@ -25,18 +25,14 @@ public class JwtLogoutHandler implements LogoutHandler {
 
         tokenProvider.expireRefreshCookie(response);
 
-        log.warn("분기 바로 시작 전");
-
         if (authentication != null
             && authentication.getPrincipal() instanceof DiscodeitUserDetails userDetails) {
 
-            log.warn("분기로 인해 상태 변화가 이루어지지 않음");
-
             jwtRegistry.invalidateJwtInformationByUserId(userDetails.userId());
+
             log.debug("[JwtLogoutHandler] JWT Registry에서 사용자 정보 제거 완료 - userId: {}",
                 userDetails.userId());
         }
-
 
     }
 }

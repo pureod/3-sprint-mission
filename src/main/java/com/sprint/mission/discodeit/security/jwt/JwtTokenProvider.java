@@ -229,20 +229,5 @@ public class JwtTokenProvider {
         }
     }
 
-    public String getTokenId(String token) {
-        try {
-            log.debug("[TokenProvider] getTokenId 호출됨: jti 추출 시작");
-
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            String jti = signedJWT.getJWTClaimsSet().getJWTID();
-
-            log.debug("[TokenProvider] getTokenId 결과: jti=" + jti);
-
-            return jti;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token", e);
-        }
-    }
-
 
 }
