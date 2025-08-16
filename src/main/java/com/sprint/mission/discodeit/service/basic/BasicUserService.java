@@ -21,7 +21,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,6 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
-    private final SessionRegistry sessionRegistry;
     private final JwtRegistry jwtRegistry;
 
     @Transactional
@@ -156,8 +154,8 @@ public class BasicUserService implements UserService {
             })
             .orElse(null);
 
-        String newPassword = userUpdateRequest.newPassword();
-        user.update(newUsername, newEmail, newPassword, nullableProfile);
+        String encodedNewPassword = passwordEncoder.encode(userUpdateRequest.newPassword());
+        user.update(newUsername, newEmail, encodedNewPassword, nullableProfile);
 
         log.info("사용자 수정 완료 - userId: {}, username: {}, email: {}",
             userId, newUsername, newEmail);
@@ -187,18 +185,6 @@ public class BasicUserService implements UserService {
         if (userId == null) {
             return false;
         }
-
-//        // 세션 기반 온라인 상태 확인
-//        boolean isOnlineBySession = sessionRegistry.getAllPrincipals().stream()
-//            .filter(DiscodeitUserDetails.class::isInstance)
-//            .map(DiscodeitUserDetails.class::cast)
-//            .filter(userDetails -> userId.equals(userDetails.getUserDto().id()))
-//            .anyMatch(userDetails ->
-//                sessionRegistry.getAllSessions(userDetails, false).stream()
-//                    .anyMatch(session -> !session.isExpired())
-//            );
-
-        // JWT 기반 온라인 상태 확인
 
         return jwtRegistry.hasActiveJwtInformationByUserId(userId);
 
