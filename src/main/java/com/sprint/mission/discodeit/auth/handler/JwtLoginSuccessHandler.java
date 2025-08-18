@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.dto.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.jwt.JwtInformation;
+import com.sprint.mission.discodeit.exception.auth.InvalidPrincipalException;
+import com.sprint.mission.discodeit.exception.auth.TokenGenerateFailedException;
 import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import jakarta.servlet.ServletException;
@@ -69,22 +71,14 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
             } catch (Exception e) {
                 log.error("[JwtLoginSuccessHandler] 예외 발생: {}", e.getMessage());
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write(objectMapper.createObjectNode()
-                    .put("success", false)
-                    .put("message", "Token generation failed")
-                    .toString());
+                throw new TokenGenerateFailedException(e.getMessage());
             }
 
         } else {
             log.warn("[JwtLoginSuccessHandler] Invalid principal: {}",
                 authentication.getPrincipal());
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(objectMapper.createObjectNode()
-                .put("success", false)
-                .put("message", "Invalid principal")
-                .toString());
+            throw new InvalidPrincipalException("Principal이 DiscodeitUserDetails 형태가 아닙니다");
         }
 
     }
