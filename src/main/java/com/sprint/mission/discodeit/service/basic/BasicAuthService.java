@@ -1,20 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.nimbusds.jose.JOSEException;
+import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.jwt.JwtDto;
+import com.sprint.mission.discodeit.dto.jwt.JwtInformation;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.auth.InvalidTokenException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,6 +37,8 @@ public class BasicAuthService implements AuthService {
     private final UserMapper userMapper;
     private final SessionRegistry sessionRegistry;
     private final JwtRegistry jwtRegistry;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final DiscodeitUserDetailsService userDetailsService;
 
     @Override
     public UserDto getCurrentUserInfo(UserDetails userDetails) {
@@ -64,6 +72,43 @@ public class BasicAuthService implements AuthService {
             online,
             userResponse.role()
         );
+    }
+
+    @Override
+    public JwtDto refreshToken(String refreshToken, HttpServletResponse response) {
+
+        if (refreshToken == null || !jwtTokenProvider.validateRefreshToken(refreshToken)) {
+            throw new InvalidTokenException("유효하지 않은 refreshToken입니다");
+        }
+
+        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+
+        DiscodeitUserDetails userDetails =
+            (DiscodeitUserDetails) userDetailsService.loadUserByUsername(username);
+
+        UserDto userDto = userDetails.getUserDto();
+
+        try {
+            String newAccessToken = jwtTokenProvider.generateAccessToken(userDetails);
+            String newRefreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
+
+            jwtTokenProvider.expireRefreshCookie(response);
+            jwtTokenProvider.addRefreshCookie(response, newRefreshToken);
+
+            log.debug("[AuthService] 토큰 재발급 완료 - username: {}", username);
+
+            JwtInformation newInfo = new JwtInformation(userDto, newAccessToken, newRefreshToken);
+
+            jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
+            jwtTokenProvider.addRefreshCookie(response, newRefreshToken);
+
+            return JwtDto.of(userDto, newAccessToken);
+
+        } catch (JOSEException e) {
+            log.error("[AuthService] 토큰 생성 중 오류 발생", e);
+            throw new InvalidTokenException("토큰 생성 중 오류가 발생했습니다");
+
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")

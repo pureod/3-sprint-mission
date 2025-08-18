@@ -1,14 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.nimbusds.jose.JOSEException;
-import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
-import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetailsService;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
-import com.sprint.mission.discodeit.exception.auth.InvalidTokenException;
 import com.sprint.mission.discodeit.dto.jwt.JwtDto;
-import com.sprint.mission.discodeit.dto.jwt.JwtInformation;
-import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,10 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final DiscodeitUserDetailsService userDetailsService;
-    private final JwtRegistry jwtRegistry;
-    private final JwtTokenProvider tokenProvider;
 
     @GetMapping("/csrf-token")
     public ResponseEntity<Void> getCsrfToken(CsrfToken csrfToken) {
@@ -51,45 +41,15 @@ public class AuthController {
         @CookieValue(
             name = JwtTokenProvider.REFRESH_TOKEN_COOKIE_NAME,
             required = false
-        )
-        String refreshToken,
+        ) String refreshToken,
         HttpServletResponse response
     ) {
 
         log.debug("[AuthController] 리프레시 토큰 재발급 요청");
 
-        if (refreshToken == null || !jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            throw new InvalidTokenException("유효하지 않은 refreshToken입니다");
-        }
+        JwtDto jwtDto = authService.refreshToken(refreshToken, response);
 
-        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
-
-        DiscodeitUserDetails userDetails =
-            (DiscodeitUserDetails) userDetailsService.loadUserByUsername(username);
-
-        UserDto userDto = userDetails.getUserDto();
-
-        try {
-            String newAccessToken = jwtTokenProvider.generateAccessToken(userDetails);
-            String newRefreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
-
-            jwtTokenProvider.expireRefreshCookie(response);
-            jwtTokenProvider.addRefreshCookie(response, newRefreshToken);
-
-            log.debug("[AuthController] 토큰 재발급 완료 - username: {}", username);
-
-            JwtInformation newInfo = new JwtInformation(userDto, newAccessToken, newRefreshToken);
-
-            jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
-            tokenProvider.addRefreshCookie(response, newRefreshToken);
-
-            return ResponseEntity.ok(JwtDto.of(userDto, newAccessToken));
-
-        } catch (JOSEException e) {
-            log.error("[AuthController] 토큰 생성 중 오류 발생", e);
-            throw new InvalidTokenException("토큰 생성 중 오류가 발생했습니다");
-
-        }
+        return ResponseEntity.ok(jwtDto);
     }
 
     @PutMapping("/role")
