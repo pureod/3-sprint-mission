@@ -1,5 +1,9 @@
-ALTER TABLE users
-    ADD role varchar(20) NOT NULL default 'USER';
+-- ALTER TABLE users
+--     ADD role varchar(20) NOT NULL default 'USER';
+-- ALTER TABLE binary_contents
+--     ADD COLUMN updated_at timestamp with time zone;
+-- ALTER TABLE binary_contents
+--     ADD COLUMN status varchar(20) NOT NULL DEFAULT 'SUCCESS';
 
 -- drop all tables
 DROP TABLE IF EXISTS binary_contents CASCADE;
@@ -15,10 +19,11 @@ CREATE TABLE binary_contents
 (
     id           uuid PRIMARY KEY,
     created_at   timestamp with time zone NOT NULL,
+    updated_at   timestamp with time zone,
     file_name    varchar(255)             NOT NULL,
     size         bigint                   NOT NULL,
     content_type varchar(100)             NOT NULL,
-    bytes        bytea
+    status       varchar(20)              NOT NULL
 );
 
 -- users

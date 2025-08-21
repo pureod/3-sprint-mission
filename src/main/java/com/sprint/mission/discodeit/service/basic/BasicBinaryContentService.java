@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -71,6 +73,17 @@ public class BasicBinaryContentService implements BinaryContentService {
         binaryContentRepository.deleteById(binaryContentId);
 
         log.info("파일 삭제 완료 - fileId: {}", binaryContentId);
+    }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public BinaryContentDto updateStatus(UUID binaryContentId, BinaryContentStatus status) {
+
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+            .orElseThrow(() -> new BinaryContentNotFoundException(binaryContentId));
+
+        binaryContent.updateStatus(status);
+
+        return binaryContentMapper.toDto(binaryContent);
     }
 }

@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.event.listener;
 
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class BinaryContentEventListener {
 
     private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentService binaryContentService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(BinaryContentCreatedEvent event) {
@@ -25,8 +28,16 @@ public class BinaryContentEventListener {
         log.debug("[BinaryContentCreatedEventListener] AFTER_COMMIT - store id={} size={}",
             binaryContentId, bytes == null ? 0 : bytes.length);
 
-        binaryContentStorage.put(binaryContentId, bytes);
+        try {
+            binaryContentStorage.put(binaryContentId, bytes);
+            binaryContentService.updateStatus(binaryContentId, BinaryContentStatus.SUCCESS);
 
-        log.debug("[BinaryContentCreatedEventListener] AFTER_COMMIT - store complete");
+            log.debug("[BinaryContentCreatedEventListener] store complete -> SUCCESS");
+        } catch (Exception e) {
+            log.warn("[BinaryContentCreatedEventListener] store failed -> FAIL id={} cause={}",
+                binaryContentId, e.toString());
+
+            binaryContentService.updateStatus(binaryContentId, BinaryContentStatus.FAIL);
+        }
     }
 }
