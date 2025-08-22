@@ -13,6 +13,14 @@
 -- WHERE rs.channel_id = c.id
 --   AND rs.notification_enabled IS DISTINCT FROM (c.type = 'PRIVATE');
 
+-- INSERT INTO notifications (id, created_at, receiver_id, title, content)
+-- VALUES (gen_random_uuid(),
+--         now(),
+--         '6d6a6a8a-93f5-4694-8bcf-bac206fb8693',
+--         '연습 알림',
+--         '이것은 연습용 알림입니다.')
+-- RETURNING *;
+
 -- drop all tables
 DROP TABLE IF EXISTS binary_contents CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -114,4 +122,14 @@ CREATE TABLE message_attachments
         REFERENCES messages (id) ON DELETE CASCADE,
     CONSTRAINT fk_attachment_image FOREIGN KEY (attachment_id)
         REFERENCES binary_contents (id) ON DELETE CASCADE
+);
+
+-- notifications
+CREATE TABLE notifications
+(
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    receiver_id uuid                     NOT NULL,
+    title       varchar(120)             NOT NULL,
+    content     text                     NOT NULL
 );

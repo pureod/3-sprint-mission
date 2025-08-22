@@ -120,7 +120,7 @@ public class BasicMessageService implements MessageService {
                 author,
                 channel,
                 content,
-                message.getCreatedAt()
+                Instant.now()
             )
         );
 

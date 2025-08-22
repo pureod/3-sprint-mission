@@ -10,7 +10,7 @@ public record MessageCreatedEvent(
     User author,
     Channel channel,
     String content,
-    Instant createdAt
+    Instant occurredAt
 ) {
 
 }
