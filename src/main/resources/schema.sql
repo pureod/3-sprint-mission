@@ -4,6 +4,14 @@
 --     ADD COLUMN updated_at timestamp with time zone;
 -- ALTER TABLE binary_contents
 --     ADD COLUMN status varchar(20) NOT NULL DEFAULT 'SUCCESS';
+-- ALTER TABLE read_statuses
+--     ADD COLUMN notification_enabled boolean NOT NULL default true;
+
+-- UPDATE read_statuses rs
+-- SET notification_enabled = (c.type = 'PRIVATE')
+-- FROM channels c
+-- WHERE rs.channel_id = c.id
+--   AND rs.notification_enabled IS DISTINCT FROM (c.type = 'PRIVATE');
 
 -- drop all tables
 DROP TABLE IF EXISTS binary_contents CASCADE;
@@ -82,12 +90,13 @@ CREATE TABLE messages
 -- read_statuses
 CREATE TABLE read_statuses
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    updated_at   timestamp with time zone,
-    user_id      uuid,
-    channel_id   uuid,
-    last_read_at timestamp with time zone NOT NULL,
+    id                   uuid PRIMARY KEY,
+    created_at           timestamp with time zone NOT NULL,
+    updated_at           timestamp with time zone,
+    user_id              uuid                     NOT NULL,
+    channel_id           uuid                     NOT NULL,
+    last_read_at         timestamp with time zone NOT NULL,
+    notification_enabled boolean                  NOT NULL,
     CONSTRAINT uk_read_status UNIQUE (user_id, channel_id),
     CONSTRAINT fk_read_user FOREIGN KEY (user_id)
         REFERENCES users (id) ON DELETE CASCADE,
