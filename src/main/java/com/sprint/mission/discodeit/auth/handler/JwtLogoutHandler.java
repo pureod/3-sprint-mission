@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -27,14 +29,14 @@ public class JwtLogoutHandler implements LogoutHandler {
 
         tokenProvider.expireRefreshCookie(response);
 
-        if (authentication != null
-            && authentication.getPrincipal() instanceof DiscodeitUserDetails userDetails) {
-
-            jwtRegistry.invalidateJwtInformationByUserId(userDetails.userId());
-
-            log.debug("[JwtLogoutHandler] JWT Registry에서 사용자 정보 제거 완료 - userId: {}",
-                userDetails.userId());
-        }
+        Arrays.stream(request.getCookies())
+            .filter(cookie -> cookie.getName().equals(JwtTokenProvider.REFRESH_TOKEN_COOKIE_NAME))
+            .findFirst()
+            .ifPresent(cookie -> {
+                String refreshToken = cookie.getValue();
+                UUID userId = tokenProvider.getUserId(refreshToken);
+                jwtRegistry.invalidateJwtInformationByUserId(userId);
+            });
 
     }
 }
