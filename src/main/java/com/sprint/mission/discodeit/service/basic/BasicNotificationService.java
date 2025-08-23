@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -22,24 +23,24 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void createNotification(UUID receiverId, String title, String content) {
 
-        log.debug("알림 생성 중 - receiverId: {}, title: {}, content: {}", receiverId, title, content);
+        log.info("알림 생성 중 - receiverId: {}, title: {}, content: {}", receiverId, title, content);
 
-        Notification notification = new Notification(content, title, receiverId);
+        Notification notification = new Notification(receiverId, title, content);
 
         Notification savedNotification = notificationRepository.save(notification);
 
-        log.debug("알림 생성 완료 - notificationId: {}", savedNotification.getId());
+        log.info("알림 생성 완료 - notificationId: {}", savedNotification.getId());
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<NotificationDto> findAllById(UUID userId) {
 
-        log.debug("알림 목록 조회 - userId: {}", userId);
+        log.info("알림 목록 조회 - userId: {}", userId);
 
         return notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(userId)
             .stream().map(notificationMapper::toDto).toList();
@@ -49,7 +50,7 @@ public class BasicNotificationService implements NotificationService {
     @Override
     public void deleteMyNotification(UUID notificationId, UUID userId) {
 
-        log.debug("알림 확인 - notificationId: {}", notificationId);
+        log.info("알림 확인 - notificationId: {}", notificationId);
 
         Notification notification = notificationRepository.findById(notificationId)
             .orElseThrow(() -> new NotificationNotFoundException("존재하지 않는 알림입니다"));
