@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.event.listener;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.event.BinaryStorageFailedEvent;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class NotificationEventListener {
 
     private final NotificationService notificationService;
+    private final UserService userService;
     private final ReadStatusRepository readStatusRepository;
 
     @Async("asyncExecutor")
@@ -55,6 +58,24 @@ public class NotificationEventListener {
         String content = String.format("%s -> %s", event.oldRole(), event.newRole());
 
         notificationService.createNotification(event.userId(), title, content);
+    }
+
+    @Async("asyncExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void on(BinaryStorageFailedEvent event) {
+
+        String title = "S3 파일 업로드 실패";
+        String content = """
+            Task: S3BinaryContentStorage#put
+            RequestId: %s
+            BinaryContentId: %s
+            Error: %s
+            """.formatted(event.requestId(), event.binaryContentId(), event.errorSummary());
+
+        List<UUID> adminIds = userService.findAdminIds();
+        for (UUID adminId : adminIds) {
+            notificationService.createNotification(adminId, title, content);
+        }
     }
 
     private static String buildTitleName(Channel channel) {

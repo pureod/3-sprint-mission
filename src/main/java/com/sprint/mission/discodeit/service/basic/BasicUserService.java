@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
@@ -187,6 +188,7 @@ public class BasicUserService implements UserService {
         log.info("사용자 삭제 완료 - userId: {}", userId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean isUserOnline(UUID userId) {
 
@@ -195,7 +197,12 @@ public class BasicUserService implements UserService {
         }
 
         return jwtRegistry.hasActiveJwtInformationByUserId(userId);
+    }
 
+    @Transactional(readOnly = true)
+    public List<UUID> findAdminIds() {
+
+        return userRepository.findUserIdsByRole(Role.ADMIN);
     }
 
     private UserDto setOnlineStatus(UserDto userDto) {

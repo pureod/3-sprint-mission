@@ -26,6 +26,7 @@ public enum ErrorCode {
     // 파일
     BINARY_CONTENT_NOT_FOUND("BinaryContent를 찾을 수 없습니다."),
     FILE_PROCESSING_FAILED("이미지 처리 중 오류가 발생했습니다."),
+    UPLOAD_IMAGE_S3_RETRIED_FAILED("재시도 끝에 S3에 업로드하는데 실패하였습니다 "),
 
     // 로그인
     INVALID_USERNAME_OR_PASSWORD("username 또는 password가 틀렸습니다."),
