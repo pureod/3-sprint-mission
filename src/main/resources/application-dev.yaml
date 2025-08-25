@@ -30,12 +30,12 @@ spring:
 
 logging:
   level:
-    root: info
-    com.sprint.mission.discodeit: info
+    root: debug
+    com.sprint.mission.discodeit: debug
     org.hibernate.SQL: off
     org.hibernate.orm.jdbc.bind: off
-    org.springframework.security: debug
-    org.springframework.web: debug
+    org.springframework.security: warn
+    org.springframework.web: warn
 
 server:
   port: 8080
