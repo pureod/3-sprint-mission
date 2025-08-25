@@ -9,8 +9,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
@@ -22,8 +21,8 @@ public class JwtLogoutHandler implements LogoutHandler {
 
     private final JwtTokenProvider tokenProvider;
     private final JwtRegistry jwtRegistry;
-    private final CacheManager cacheManager;
 
+    @CacheEvict(value = CacheConfig.USERS_ALL, allEntries = true)
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
@@ -40,11 +39,6 @@ public class JwtLogoutHandler implements LogoutHandler {
                 UUID userId = tokenProvider.getUserId(refreshToken);
                 jwtRegistry.invalidateJwtInformationByUserId(userId);
             });
-
-        Cache cache = cacheManager.getCache(CacheConfig.USERS_ALL);
-        if (cache != null) {
-            cache.clear();
-        }
 
     }
 }

@@ -15,8 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -30,8 +30,8 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider tokenProvider;
     private final JwtRegistry jwtRegistry;
-    private final CacheManager cacheManager;
 
+    @CacheEvict(value = CacheConfig.USERS_ALL, allEntries = true)
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {
@@ -69,11 +69,6 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
                 String responseBody = objectMapper.writeValueAsString(jwtDto);
 
                 response.getWriter().write(responseBody);
-
-                Cache cache = cacheManager.getCache(CacheConfig.USERS_ALL);
-                if (cache != null) {
-                    cache.clear();
-                }
 
                 log.debug("[JwtLoginSuccessHandler] JWT 로그인 성공 응답 완료 - username={}",
                     discodeitUserDetails.getUsername());
