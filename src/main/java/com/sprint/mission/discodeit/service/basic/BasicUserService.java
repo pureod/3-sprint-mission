@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import static com.sprint.mission.discodeit.config.CacheConfig.USERS_ALL;
+
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -21,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -102,6 +105,8 @@ public class BasicUserService implements UserService {
             .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
+    @Cacheable(cacheNames = USERS_ALL, key = "'all'",
+        unless = "#result == null || #result.isEmpty()")
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import static com.sprint.mission.discodeit.config.CacheConfig.NOTIFICATIONS_BY_USER;
+
 import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.exception.notification.NotificationAccessDeniedException;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +39,8 @@ public class BasicNotificationService implements NotificationService {
         log.info("알림 생성 완료 - notificationId: {}", savedNotification.getId());
     }
 
+    @Cacheable(value = NOTIFICATIONS_BY_USER, key = "#userId",
+        unless = "#result == null || #result.isEmpty()")
     @Transactional(readOnly = true)
     @Override
     public List<NotificationDto> findAllById(UUID userId) {
