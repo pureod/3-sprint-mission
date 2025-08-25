@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.auth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.auth.service.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.config.CacheConfig;
 import com.sprint.mission.discodeit.dto.jwt.JwtDto;
 import com.sprint.mission.discodeit.dto.jwt.JwtInformation;
 import com.sprint.mission.discodeit.exception.auth.InvalidPrincipalException;
@@ -14,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -27,6 +30,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider tokenProvider;
     private final JwtRegistry jwtRegistry;
+    private final CacheManager cacheManager;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -65,6 +69,11 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
                 String responseBody = objectMapper.writeValueAsString(jwtDto);
 
                 response.getWriter().write(responseBody);
+
+                Cache cache = cacheManager.getCache(CacheConfig.USERS_ALL);
+                if (cache != null) {
+                    cache.clear();
+                }
 
                 log.debug("[JwtLoginSuccessHandler] JWT 로그인 성공 응답 완료 - username={}",
                     discodeitUserDetails.getUsername());

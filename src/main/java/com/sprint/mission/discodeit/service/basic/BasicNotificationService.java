@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,6 +27,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
+    @CacheEvict(cacheNames = NOTIFICATIONS_BY_USER, key = "#receiverId")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void createNotification(UUID receiverId, String title, String content) {
@@ -51,6 +53,7 @@ public class BasicNotificationService implements NotificationService {
             .stream().map(notificationMapper::toDto).toList();
     }
 
+    @CacheEvict(cacheNames = NOTIFICATIONS_BY_USER, key = "#userId")
     @Transactional
     @Override
     public void deleteMyNotification(UUID notificationId, UUID userId) {

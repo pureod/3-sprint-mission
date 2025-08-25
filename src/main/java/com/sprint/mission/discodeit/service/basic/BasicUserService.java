@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +43,7 @@ public class BasicUserService implements UserService {
     private final JwtRegistry jwtRegistry;
     private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = USERS_ALL, allEntries = true)
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
@@ -117,6 +119,7 @@ public class BasicUserService implements UserService {
             .toList();
     }
 
+    @CacheEvict(cacheNames = USERS_ALL, allEntries = true)
     @PreAuthorize("#userId == principal.userDto.id()")
     @Transactional
     @Override
@@ -177,6 +180,7 @@ public class BasicUserService implements UserService {
         return setOnlineStatus(userMapper.toDto(user));
     }
 
+    @CacheEvict(cacheNames = USERS_ALL, allEntries = true)
     @PreAuthorize("#userId == principal.userDto.id()")
     @Transactional
     @Override
