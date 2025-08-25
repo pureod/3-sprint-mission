@@ -22,7 +22,5 @@ public interface UserService {
 
     void delete(UUID userId);
 
-    boolean isUserOnline(UUID userId);
-
     List<UUID> findAdminIds();
 }

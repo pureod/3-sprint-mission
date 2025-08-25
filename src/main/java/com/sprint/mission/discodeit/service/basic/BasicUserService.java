@@ -100,6 +100,7 @@ public class BasicUserService implements UserService {
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDto find(UUID userId) {
         return userRepository.findById(userId)
@@ -198,17 +199,6 @@ public class BasicUserService implements UserService {
     }
 
     @Transactional(readOnly = true)
-    @Override
-    public boolean isUserOnline(UUID userId) {
-
-        if (userId == null) {
-            return false;
-        }
-
-        return jwtRegistry.hasActiveJwtInformationByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
     public List<UUID> findAdminIds() {
 
         return userRepository.findUserIdsByRole(Role.ADMIN);
@@ -226,6 +216,15 @@ public class BasicUserService implements UserService {
             online,
             userDto.role()
         );
+    }
+
+    private boolean isUserOnline(UUID userId) {
+
+        if (userId == null) {
+            return false;
+        }
+
+        return jwtRegistry.hasActiveJwtInformationByUserId(userId);
     }
 
 }
