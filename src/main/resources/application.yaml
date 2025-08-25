@@ -49,6 +49,9 @@ management:
       exposure:
         include: health, info, metrics, loggers
       base-path: /actuator
+  observations:
+    annotations:
+      enabled: true
   endpoint:
     health:
       show-details: always
