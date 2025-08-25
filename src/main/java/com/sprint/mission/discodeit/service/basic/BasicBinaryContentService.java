@@ -77,13 +77,11 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public BinaryContentDto updateStatus(UUID binaryContentId, BinaryContentStatus status) {
+    public void updateStatus(UUID binaryContentId, BinaryContentStatus status) {
 
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> new BinaryContentNotFoundException(binaryContentId));
 
         binaryContent.updateStatus(status);
-
-        return binaryContentMapper.toDto(binaryContent);
     }
 }

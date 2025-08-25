@@ -60,6 +60,5 @@ public class BasicNotificationService implements NotificationService {
         }
 
         notificationRepository.delete(notification);
-
     }
 }
