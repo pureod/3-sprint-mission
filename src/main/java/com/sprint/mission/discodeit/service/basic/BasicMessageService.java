@@ -117,8 +117,10 @@ public class BasicMessageService implements MessageService {
         eventPublisher.publishEvent(
             new MessageCreatedEvent(
                 message.getId(),
-                author,
-                channel,
+                author.getId(),
+                author.getUsername(),
+                channel.getId(),
+                channel.getName(),
                 content,
                 Instant.now()
             )

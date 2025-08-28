@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.event.listener;
+package com.sprint.mission.discodeit.event.listener.local;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.event.BinaryStorageFailedEvent;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.RoleUpdatedEvent;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -19,6 +19,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "feature.notification.local-listener-enabled", havingValue = "true")
 public class NotificationEventListener {
 
     private final NotificationService notificationService;
@@ -32,15 +33,15 @@ public class NotificationEventListener {
         log.debug("[NotificationRequiredEventListener] 메세지 생성 알림 이벤트 리스너 시작");
 
         List<UUID> receiverIds = readStatusRepository
-            .findUserIdsByChannelIdAndNotificationEnabledTrue(event.channel().getId());
+            .findUserIdsByChannelIdAndNotificationEnabledTrue(event.channelId());
 
         log.debug("알림을 받는 유저: {}", receiverIds);
 
         receiverIds.stream()
-            .filter(receiverId -> !receiverId.equals(event.author().getId()))
+            .filter(receiverId -> !receiverId.equals(event.authorId()))
             .forEach(receiverId -> {
                 String title = String.format("%s (%s)",
-                    event.author().getUsername(), buildTitleName(event.channel())
+                    event.authorName(), buildTitleName(event.channelName())
                 );
                 String content = event.content();
 
@@ -78,7 +79,7 @@ public class NotificationEventListener {
         }
     }
 
-    private static String buildTitleName(Channel channel) {
-        return (channel.getName() != null) ? channel.getName() : "Private";
+    private static String buildTitleName(String channelName) {
+        return (channelName != null) ? channelName : "Private";
     }
 }

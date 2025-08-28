@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.event.listener;
+package com.sprint.mission.discodeit.event.listener.local;
 
 import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
