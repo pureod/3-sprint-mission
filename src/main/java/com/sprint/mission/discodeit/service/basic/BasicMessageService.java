@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.InvalidMessageContentException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -20,15 +22,16 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -39,13 +42,12 @@ import org.springframework.util.StringUtils;
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
-    //
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final MessageMapper messageMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -92,7 +94,11 @@ public class BasicMessageService implements MessageService {
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                         contentType);
                     binaryContentRepository.save(binaryContent);
-                    binaryContentStorage.put(binaryContent.getId(), bytes);
+
+                    eventPublisher.publishEvent(
+                        new BinaryContentCreatedEvent(binaryContent.getId(), bytes)
+                    );
+
                     return binaryContent;
                 })
                 .toList()
@@ -107,6 +113,18 @@ public class BasicMessageService implements MessageService {
         );
 
         messageRepository.save(message);
+
+        eventPublisher.publishEvent(
+            new MessageCreatedEvent(
+                message.getId(),
+                author.getId(),
+                author.getUsername(),
+                channel.getId(),
+                channel.getName(),
+                content,
+                Instant.now()
+            )
+        );
 
         log.info("메시지 생성 완료 - messageId: {}, channelId: {}, 첨부파일 수: {}",
             message.getId(), channelId, attachments.size());
@@ -148,6 +166,7 @@ public class BasicMessageService implements MessageService {
         return pageResponseMapper.fromSlice(slice, nextCursor);
     }
 
+    @PreAuthorize("@basicMessageService.isAuthor(#messageId, principal.userDto.id())")
     @Transactional
     @Override
     public MessageDto update(UUID messageId, MessageUpdateRequest request) {
@@ -167,6 +186,7 @@ public class BasicMessageService implements MessageService {
         return messageMapper.toDto(message);
     }
 
+    @PreAuthorize("@basicMessageService.isAuthor(#messageId, principal.userDto.id())")
     @Transactional
     @Override
     public void delete(UUID messageId) {
@@ -180,5 +200,12 @@ public class BasicMessageService implements MessageService {
         messageRepository.deleteById(messageId);
 
         log.info("메시지 삭제 완료 - messageId: {}", messageId);
+    }
+
+    public boolean isAuthor(UUID messageId, UUID userId) {
+
+        return messageRepository.findById(messageId)
+            .map(message -> message.getAuthor().getId().equals(userId))
+            .orElse(false);
     }
 }

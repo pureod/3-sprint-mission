@@ -5,10 +5,6 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-    // 사용자 상태
-    USER_STATUS_ALREADY_EXISTS("이미 UserStatus가 존재합니다."),
-    USER_STATUS_NOT_FOUND("UserStatus를 찾을 수 없습니다."),
-
     // 사용자
     EMAIL_ALREADY_EXISTS("이미 등록된 Email입니다."),
     USERNAME_ALREADY_EXISTS("이미 사용 중인 UserName입니다."),
@@ -30,9 +26,19 @@ public enum ErrorCode {
     // 파일
     BINARY_CONTENT_NOT_FOUND("BinaryContent를 찾을 수 없습니다."),
     FILE_PROCESSING_FAILED("이미지 처리 중 오류가 발생했습니다."),
+    UPLOAD_IMAGE_S3_RETRIED_FAILED("재시도 끝에 S3에 업로드하는데 실패하였습니다 "),
 
     // 로그인
-    INVALID_USERNAME_OR_PASSWORD("username 또는 password가 틀렸습니다.");
+    INVALID_USERNAME_OR_PASSWORD("username 또는 password가 틀렸습니다."),
+
+    // 토큰
+    INVALID_JWT_TOKEN("유효하지 않은 토큰입니다."),
+    FAILED_TOKEN_GENERATED("토큰 생성에 실패하였습니다"),
+    INVALID_PRINCIPAL("잘못된 형태의 Principal입니다"),
+
+    // 알림
+    NOTIFICATION_NOT_FOUND("알림이 존재하지 않습니다"),
+    NOTIFICATION_ACCESS_DENIED("다른 사용자의 알림은 확인할 수 없습니다");
 
     private final String message;
 

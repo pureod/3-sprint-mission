@@ -18,7 +18,7 @@ jacocoTestReport {
 }
 
 group = 'com.sprint.mission'
-version = '1.2-M8'
+version = '2.2-M11'
 
 java {
     toolchain {
@@ -34,6 +34,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -44,6 +46,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation "org.springframework.retry:spring-retry"
 
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
@@ -59,6 +62,16 @@ dependencies {
     implementation 'org.slf4j:slf4j-api'
 
     implementation 'software.amazon.awssdk:s3:2.31.7'
+
+    implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
+
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+    
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile

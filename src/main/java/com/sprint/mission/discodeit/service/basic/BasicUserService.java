@@ -1,27 +1,33 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import static com.sprint.mission.discodeit.config.CacheConfig.USERS_ALL;
+
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNameAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtRegistry;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +37,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtRegistry jwtRegistry;
+    private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = USERS_ALL, allEntries = true)
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
@@ -67,7 +75,10 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+
+                eventPublisher.publishEvent(
+                    new BinaryContentCreatedEvent(binaryContent.getId(), bytes)
+                );
 
                 log.debug("프로필 이미지 저장 완료 - 파일명: {}, 타입: {}, 크기: {} bytes",
                     fileName, contentType, bytes.length);
@@ -76,35 +87,41 @@ public class BasicUserService implements UserService {
             })
             .orElse(null);
 
-        String password = userCreateRequest.password();
+        String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
 
-        User user = new User(username, email, password, nullableProfile);
-        Instant now = Instant.now();
-        UserStatus userStatus = new UserStatus(user, now);
+        User user = new User(username, email, encodedPassword, nullableProfile);
 
         userRepository.save(user);
 
         log.info("사용자 생성 완료 - userId: {}, username: {}, email: {}",
             user.getId(), username, email);
 
-        return userMapper.toDto(user);
+        return setOnlineStatus(userMapper.toDto(user));
+
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDto find(UUID userId) {
         return userRepository.findById(userId)
-            .map(userMapper::toDto)
+            .map(user -> setOnlineStatus(userMapper.toDto(user)))
             .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
+    @Cacheable(cacheNames = USERS_ALL, key = "'all'",
+        unless = "#result == null || #result.isEmpty()")
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {
-        return userRepository.findAllWithProfileAndStatus()
-            .stream()
-            .map(userMapper::toDto)
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+            .map(user -> setOnlineStatus(userMapper.toDto(user)))
             .toList();
     }
 
+    @CacheEvict(cacheNames = USERS_ALL, allEntries = true)
+    @PreAuthorize("#userId == principal.userDto.id()")
     @Transactional
     @Override
     public UserDto update(UUID userId,
@@ -146,20 +163,26 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+
+                eventPublisher.publishEvent(
+                    new BinaryContentCreatedEvent(binaryContent.getId(), bytes)
+                );
+
                 return binaryContent;
             })
             .orElse(null);
 
-        String newPassword = userUpdateRequest.newPassword();
-        user.update(newUsername, newEmail, newPassword, nullableProfile);
+        String encodedNewPassword = passwordEncoder.encode(userUpdateRequest.newPassword());
+        user.update(newUsername, newEmail, encodedNewPassword, nullableProfile);
 
         log.info("사용자 수정 완료 - userId: {}, username: {}, email: {}",
             userId, newUsername, newEmail);
 
-        return userMapper.toDto(user);
+        return setOnlineStatus(userMapper.toDto(user));
     }
 
+    @CacheEvict(cacheNames = USERS_ALL, allEntries = true)
+    @PreAuthorize("#userId == principal.userDto.id()")
     @Transactional
     @Override
     public void delete(UUID userId) {
@@ -174,4 +197,34 @@ public class BasicUserService implements UserService {
 
         log.info("사용자 삭제 완료 - userId: {}", userId);
     }
+
+    @Transactional(readOnly = true)
+    public List<UUID> findAdminIds() {
+
+        return userRepository.findUserIdsByRole(Role.ADMIN);
+    }
+
+    private UserDto setOnlineStatus(UserDto userDto) {
+
+        boolean online = isUserOnline(userDto.id());
+
+        return new UserDto(
+            userDto.id(),
+            userDto.username(),
+            userDto.email(),
+            userDto.profile(),
+            online,
+            userDto.role()
+        );
+    }
+
+    private boolean isUserOnline(UUID userId) {
+
+        if (userId == null) {
+            return false;
+        }
+
+        return jwtRegistry.hasActiveJwtInformationByUserId(userId);
+    }
+
 }
